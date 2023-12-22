@@ -4,6 +4,9 @@
 
 <h3>Hotels </h3>
 
+<input @oninput="Search" placeholder="Search..." class="p-3" />
+
+
 @if (hotels.Count <= 0)
 {
     <span> Loading Hotels...</span>
@@ -34,9 +37,6 @@ else
    
 }
 
-
-
-
 @code {
     List<Hotel> hotels = new List<Hotel>();
 
@@ -48,4 +48,19 @@ else
             hotels = result;
         }
     }
+
+    private async void Search(ChangeEventArgs args)
+    {
+        var searchTerm = (string)args.Value;
+       
+        var result = await http.GetFromJsonAsync<List<Hotel>>("/api/hotel");
+        // make it case insensitive to search hotels
+
+        hotels = result.Where(x => x.Name.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
+               .OrderByDescending(x => x.Id)
+               .ToList();
+
+        StateHasChanged();
+    }
+
 }
