@@ -21,5 +21,6 @@ namespace BlazorHotelBooking.Shared
         public float FamPrice { get; set; }
         [Required]
         public int Spaces { get; set; }
+        public string Description { get; set; }
     }
 }
