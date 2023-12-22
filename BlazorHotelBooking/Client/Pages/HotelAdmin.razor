@@ -1,25 +1,73 @@
 ﻿@page "/hoteladmin"
-@page "/hoteladmin/{id}"
+
 @using BlazorHotelBooking.Shared
 @inject HttpClient http
+@inject NavigationManager NavigationManager
 
-<h3>HotelAdmin for </h3>
 
-@if(Id is null)
+<h3>Hotels</h3>
+<button @onclick="AddHotel" class="btn btn-primary">Add Hotel</button>
+<br />
+
+@if (hotels is null)
 {
-    
+    <span>Loading Hotels…</span>
+
+}
+else
+{
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Single Bed</th>
+                <th>Double Bed</th>
+                <th>Family Room</th>
+                <th>Spaces Remaining</th>
+            </tr>
+
+        </thead>
+        <tbody>
+            @foreach (var h in hotels)
+            {
+                <tr>
+                    <td width="5%">@h.Id</td>
+                    <td width="5%">@h.Name</td>
+                    <td width="5%">@h.SBPrice</td>
+                    <td width="5%">@h.DBPrice</td>
+                    <td width="5%">@h.FamPrice</td>
+                    <td width="5%">@h.Spaces</td>
+                    <td width="5%">
+                        <button @onclick="(() => EditHotel(h.Id))" class="btn btn-primary">Edit</button>
+                    </td>
+                </tr>
+
+            }
+        </tbody>
+    </table>
 }
 
 
 @code {
-    [Parameter]
-    public string? Id { get; set; }
-    
-    private Hotel selectedHotel = new Hotel();
+    List<Hotel>? hotels;
 
-   
-    async Task HandleSubmit()
+    protected override async Task OnInitializedAsync()
     {
-        Console.WriteLine("handle submit!");
+        var result = await http.GetFromJsonAsync<List<Hotel>>("/api/hotel");
+        if (result != null)
+        {
+            hotels = result;
+        }
+    }
+
+    void AddHotel()
+    {
+        NavigationManager.NavigateTo("/hoteledit");
+    }
+
+    void EditHotel(int id)
+    {
+        NavigationManager.NavigateTo($"/hoteledit/{id}");
     }
 }
