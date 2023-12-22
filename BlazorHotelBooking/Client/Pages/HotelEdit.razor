@@ -2,6 +2,7 @@
 @page "/hoteledit/{id:int}"
 @using BlazorHotelBooking.Shared
 @inject HttpClient http
+@inject NavigationManager NavigationManager
 
 @if (Id is null)
 {
@@ -45,6 +46,10 @@ else
         <InputText id="Description" @bind-Value="selectedHotel.Description" class="form-control" />
     </div>
     <button type="submit" class="btn btn-primary">Save</button>
+    @if(Id is not null)
+    {
+        <button type="button" class="btn btn-danger" @onclick="DeleteHotel">Delete</button>
+    }
 </EditForm>
 
 
@@ -52,11 +57,36 @@ else
     [Parameter]
     public int? Id { get; set; }
 
-    private Hotel selectedHotel = new Hotel();
+    private Hotel selectedHotel = new Hotel { Name = "New Hotel" };
 
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id is not null)
+        {
+            var result = await http.GetFromJsonAsync<Hotel>($"api/hotel/{Id}");
+            if (result is not null)
+            {
+                selectedHotel = result;
+            }
+        }
+    }
+
+    async Task DeleteHotel()
+    {
+        await http.DeleteAsync($"api/hotel/{Id}");
+        NavigationManager.NavigateTo("/hoteladmin");
+    }
 
     async Task HandleSubmit()
     {
-        Console.WriteLine("handle submit!");
+        if(Id is null)
+        {
+            await http.PostAsJsonAsync("/api/hotel", selectedHotel);
+        }
+        else
+        {
+            await http.PutAsJsonAsync($"api/hotel/{Id}", selectedHotel);
+        }
+        NavigationManager.NavigateTo("/hoteladmin");
     }
 }
