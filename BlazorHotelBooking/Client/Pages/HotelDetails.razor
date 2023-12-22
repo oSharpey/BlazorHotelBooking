@@ -1,0 +1,45 @@
+﻿@page "/hotels/{id}"
+@using BlazorHotelBooking.Shared;
+@inject HttpClient http
+
+
+<div class="media">
+    <div class="media-body">
+        <h2 class="mb-0">@selectedHotel.Name</h2>
+        <p>@selectedHotel.Description</p>
+        <h4 class="price">
+            Single Room: £@selectedHotel.SBPrice
+        </h4>
+        <button class="btn btn-primary"><i class="oi oi-cart">&nbsp;&nbsp;&nbsp; Book Room</i></button>
+        <h4 class="price">
+            Double Room: £@selectedHotel.DBPrice
+        </h4>
+        <button class="btn btn-primary"><i class="oi oi-cart">&nbsp;&nbsp;&nbsp; Book Room</i></button>
+        <h4 class="price">
+            Family Room: £@selectedHotel.FamPrice
+        </h4>
+        <button class="btn btn-primary"><i class="oi oi-cart">&nbsp;&nbsp;&nbsp; Book Room</i></button>
+    </div>
+</div>
+
+@code {
+        private Hotel selectedHotel = new Hotel();
+
+
+        [Parameter]
+        public string Id { get; set; }
+
+        List<Hotel> hotels = new List<Hotel>();
+
+
+        protected override async Task OnInitializedAsync()
+        {
+            var result = await http.GetFromJsonAsync<List<Hotel>>("/api/hotel");
+            if (result != null)
+            {
+                hotels = result;
+            }
+
+            selectedHotel = hotels.FirstOrDefault(h => h.Id == Int32.Parse(Id));
+        }
+ }

@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34316.72
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorHotelBooking.Server", "BlazorHotelBooking\Server\BlazorHotelBooking.Server.csproj", "{6A6EF50D-A778-42F8-8390-7BFCB63ED74C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorHotelBooking.Server", "BlazorHotelBooking\Server\BlazorHotelBooking.Server.csproj", "{6A6EF50D-A778-42F8-8390-7BFCB63ED74C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorHotelBooking.Client", "BlazorHotelBooking\Client\BlazorHotelBooking.Client.csproj", "{5A339C04-BF7B-40A7-9019-115C13F8DE7F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorHotelBooking.Client", "BlazorHotelBooking\Client\BlazorHotelBooking.Client.csproj", "{5A339C04-BF7B-40A7-9019-115C13F8DE7F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorHotelBooking.Shared", "BlazorHotelBooking\Shared\BlazorHotelBooking.Shared.csproj", "{21E6D324-C570-4483-9CDB-06426D7B87B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorHotelBooking.Shared", "BlazorHotelBooking\Shared\BlazorHotelBooking.Shared.csproj", "{21E6D324-C570-4483-9CDB-06426D7B87B0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

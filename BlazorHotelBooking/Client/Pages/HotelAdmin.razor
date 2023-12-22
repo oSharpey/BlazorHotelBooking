@@ -1,0 +1,55 @@
+﻿@page "/hoteladmin"
+@using BlazorHotelBooking.Shared
+@inject HttpClient http
+
+<h3>HotelAdmin</h3>
+
+@if (hotels.Count <= 0)
+{
+    <span> Loading Hotels...</span>
+}
+else
+{
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Single Bed</th>
+                <th>Double Bed</th>
+                <th>Family Room</th>
+                <th>Spaces Left</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var hotel in hotels)
+            {
+                <tr>
+                    <td width="10%">@hotel.Id</td>
+                    <td width="10%">@hotel.Name</td>
+                    <td width="10%">@hotel.SBPrice</td>
+                    <td width="10%">@hotel.DBPrice</td>
+                    <td width="10%">@hotel.FamPrice</td>
+                    <td width="10%">@hotel.Spaces</td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+}
+
+
+
+
+@code {
+    List<Hotel> hotels = new List<Hotel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await http.GetFromJsonAsync<List<Hotel>>("/api/hotel");
+        if (result != null)
+        {
+            hotels = result;
+        }
+    }
+}
