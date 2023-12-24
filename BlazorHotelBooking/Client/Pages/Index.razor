@@ -2,23 +2,19 @@
 
 <PageTitle>Blazing Hotels</PageTitle>
 
-<h1>Hello, world!</h1>
-
-<AuthorizeView Roles="User">
-    <Authorized>
-        <p>Hello, @context.User.Identity!.Name!</p>
-    </Authorized>
-</AuthorizeView>
-
-<AuthorizeView Roles="Admin">
-    <Authorized>
-        <p>Hello, @context.User.Identity!.Name! You are signed in as an Admin</p>
-    </Authorized>
-</AuthorizeView>
-
 <AuthorizeView>
     <Authorized>
-        <p>You are signed in as a User</p>
+        <h1>Welcome to Blazing Hotel @context.User.Identity!.Name!</h1>
+        <p>Click on the Hotels link to see the list of hotels and book your desired hotel.</p>
     </Authorized>
+    <NotAuthorized>
+        <h1>Welcome to Blazing Hotel!</h1>
+        <p>You are not logged in. Please log in to access the website.</p>
+    </NotAuthorized>
 </AuthorizeView>
+<AuthorizeView Roles="Admin">
+    <p>You are logged in as an Admin.</p>
+</AuthorizeView>
+
+
 
