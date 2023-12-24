@@ -19,7 +19,7 @@ namespace BlazorHotelBooking.Server.Controllers
             _context = context;
         }
 
-
+        [HttpGet]
         public async Task<ActionResult<List<Hotel>>> GetAllHotels()
         {
             var list = await _context.Hotels.ToListAsync();

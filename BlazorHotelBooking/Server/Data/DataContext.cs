@@ -1,9 +1,12 @@
 ﻿using BlazorHotelBooking.Shared;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using BlazorHotelBooking.Server.Models;
 
 namespace BlazorHotelBooking.Server.Data
 {
-    public class DataContext: DbContext
+    public class DataContext: IdentityDbContext<ApplicationUser>
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
@@ -12,6 +15,12 @@ namespace BlazorHotelBooking.Server.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+           base.OnModelCreating(modelBuilder);
+
+
+
+
             modelBuilder.Entity<Hotel>().HasData(
                  new Hotel
                  {
