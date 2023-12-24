@@ -33,10 +33,17 @@ namespace BlazorHotelBooking.Server.Controllers
                 return BadRequest(new LoginResult { Successful = false, Error = "Username and password are invalid." });
             }
 
-            var claims = new[]
+            var user = await _signInManager.UserManager.FindByEmailAsync(login.Email);
+            var roles = await _signInManager.UserManager.GetRolesAsync(user!);
+            var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, login.Email!)
+                new Claim(ClaimTypes.Name, login.Email)
             };
+           
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JwtKey"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

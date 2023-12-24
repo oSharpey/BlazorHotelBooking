@@ -20,6 +20,7 @@ builder.Services.AddDbContext<DataContext>(options =>
 });
 
 builder.Services.AddDefaultIdentity<ApplicationUser>()
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<DataContext>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

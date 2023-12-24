@@ -5,16 +5,17 @@ using System.Net.Http.Json;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using Microsoft.AspNetCore.Components.Authorization;
 
 namespace BlazorHotelBooking.Client.Service
 {
     public class AuthService : IAuthService
     {
         private readonly HttpClient _httpClient;
-        private readonly APIAuthStateProvider _authStateProvider;
+        private readonly AuthenticationStateProvider _authStateProvider;
         private readonly ILocalStorageService _localStorage;
 
-        public AuthService(HttpClient httpClient, APIAuthStateProvider authStateProvider, ILocalStorageService localStorage)
+        public AuthService(HttpClient httpClient, AuthenticationStateProvider authStateProvider, ILocalStorageService localStorage)
         {
             _httpClient = httpClient;
             _authStateProvider = authStateProvider;
@@ -42,7 +43,7 @@ namespace BlazorHotelBooking.Client.Service
             if (!response.IsSuccessStatusCode) return loginResult!;
 
             await _localStorage.SetItemAsync("authToken", loginResult!.Token);
-            ((APIAuthStateProvider) _authStateProvider).MarkUserAsAuthenticated(loginModel.Email!);
+            ((APIAuthStateProvider) _authStateProvider).MarkUserAsAuthenticated(loginResult.Token!);
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", loginResult.Token);
 
             return loginResult;

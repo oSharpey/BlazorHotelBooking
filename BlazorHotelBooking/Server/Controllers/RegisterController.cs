@@ -35,6 +35,13 @@ namespace BlazorHotelBooking.Server.Controllers
                 return Ok(new RegisterResult { Successful = false, Errors = errors });
             }
 
+            await _userManager.AddToRoleAsync(user, "User");
+            if (user.Email == "admin@localhost")
+            {
+                await _userManager.AddToRoleAsync(user, "Admin");
+                return Ok(new RegisterResult { Successful = true });
+            }
+
             return Ok(new RegisterResult { Successful = true});
         }   
     }

@@ -64,7 +64,6 @@ namespace BlazorHotelBooking.Server.Controllers
             dbHotel.SBPrice = hotl.SBPrice;
             dbHotel.DBPrice = hotl.DBPrice;
             dbHotel.FamPrice = hotl.FamPrice;
-            dbHotel.Spaces = hotl.Spaces;
             dbHotel.Description = hotl.Description;
 
             _context.Hotels.Add(hotl);

@@ -18,7 +18,6 @@ namespace BlazorHotelBooking.Shared
         public decimal DBPrice { get; set; }
         [Column(TypeName = "decimal(18,2")]
         public decimal FamPrice { get; set; }
-        public int Spaces { get; set; }
         public string? Description { get; set; }
     }
 }

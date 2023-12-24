@@ -5,48 +5,56 @@
 @inject NavigationManager NavigationManager
 
 
-<h3>Hotels</h3>
-<button @onclick="AddHotel" class="btn btn-primary">Add Hotel</button>
-<br />
 
-@if (hotels is null)
-{
-    <span>Loading Hotels…</span>
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        <h3>Admin Page</h3>
+        <button @onclick="AddHotel" class="btn btn-primary">Add Hotel</button>
+        <br />
 
-}
-else
-{
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Single Bed</th>
-                <th>Double Bed</th>
-                <th>Family Room</th>
-                <th>Spaces Remaining</th>
-            </tr>
+        @if (hotels is null)
+        {
+            <span>Loading Hotels…</span>
 
-        </thead>
-        <tbody>
-            @foreach (var h in hotels)
-            {
-                <tr>
-                    <td width="5%">@h.Id</td>
-                    <td width="5%">@h.Name</td>
-                    <td width="5%">@h.SBPrice</td>
-                    <td width="5%">@h.DBPrice</td>
-                    <td width="5%">@h.FamPrice</td>
-                    <td width="5%">@h.Spaces</td>
-                    <td width="5%">
-                        <button @onclick="(() => EditHotel(h.Id))" class="btn btn-primary">Edit</button>
-                    </td>
-                </tr>
+        }
+        else
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Single Bed</th>
+                        <th>Double Bed</th>
+                        <th>Family Room</th>
+                    </tr>
 
-            }
-        </tbody>
-    </table>
-}
+                </thead>
+                <tbody>
+                    @foreach (var h in hotels)
+                    {
+                        <tr>
+                            <td width="5%">@h.Id</td>
+                            <td width="5%">@h.Name</td>
+                            <td width="5%">@h.SBPrice</td>
+                            <td width="5%">@h.DBPrice</td>
+                            <td width="5%">@h.FamPrice</td>
+                            <td width="5%">
+                                <button @onclick="(() => EditHotel(h.Id))" class="btn btn-primary">Edit</button>
+                            </td>
+                        </tr>
+
+                    }
+                </tbody>
+            </table>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <p>You are not signed in as an Admin</p>
+    </NotAuthorized>
+</AuthorizeView>
+
+
 
 
 @code {
