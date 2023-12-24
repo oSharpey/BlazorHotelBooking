@@ -1,11 +1,11 @@
-﻿@page "/hoteladmin"
-
+﻿@page "/admin"
 @using BlazorHotelBooking.Shared
+@using Microsoft.AspNetCore.Authorization
 @inject HttpClient http
 @inject NavigationManager NavigationManager
+@attribute [Authorize(Roles = "Admin")]
 
-
-<h3>Hotels</h3>
+<h3>Admin Page</h3>
 <button @onclick="AddHotel" class="btn btn-primary">Add Hotel</button>
 <br />
 
@@ -24,7 +24,6 @@ else
                 <th>Single Bed</th>
                 <th>Double Bed</th>
                 <th>Family Room</th>
-                <th>Spaces Remaining</th>
             </tr>
 
         </thead>
@@ -37,7 +36,6 @@ else
                     <td width="5%">@h.SBPrice</td>
                     <td width="5%">@h.DBPrice</td>
                     <td width="5%">@h.FamPrice</td>
-                    <td width="5%">@h.Spaces</td>
                     <td width="5%">
                         <button @onclick="(() => EditHotel(h.Id))" class="btn btn-primary">Edit</button>
                     </td>
@@ -54,7 +52,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var result = await http.GetFromJsonAsync<List<Hotel>>("/api/hotel");
+        var result = await http.GetFromJsonAsync<List<Hotel>>("/api/Admin/hotel");
         if (result != null)
         {
             hotels = result;

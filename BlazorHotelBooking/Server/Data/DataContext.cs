@@ -1,9 +1,12 @@
 ﻿using BlazorHotelBooking.Shared;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using BlazorHotelBooking.Server.Models;
 
 namespace BlazorHotelBooking.Server.Data
 {
-    public class DataContext: DbContext
+    public class DataContext: IdentityDbContext<ApplicationUser>
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
@@ -12,6 +15,28 @@ namespace BlazorHotelBooking.Server.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<IdentityRole>().HasData(new IdentityRole
+            {
+                Name = "User",
+                NormalizedName = "USER",
+                Id = "1",
+                ConcurrencyStamp = Guid.NewGuid().ToString()
+            });
+
+
+            modelBuilder.Entity<IdentityRole>().HasData(new IdentityRole
+            {
+                Name = "Admin",
+                NormalizedName = "ADMIN",
+                Id = "2",
+                ConcurrencyStamp = Guid.NewGuid().ToString()
+            });
+
+
+
             modelBuilder.Entity<Hotel>().HasData(
                  new Hotel
                  {
@@ -20,7 +45,6 @@ namespace BlazorHotelBooking.Server.Data
                      SBPrice = 375,
                      DBPrice = 775,
                      FamPrice = 950,
-                     Spaces = 20,
                      Description = "Experience luxury in the heart of the city, with sophisticated rooms and a stone's throw from London's major attractions and shopping districts."
                  },
 
@@ -31,7 +55,6 @@ namespace BlazorHotelBooking.Server.Data
                     SBPrice = 300,
                     DBPrice = 500,
                     FamPrice = 900,
-                    Spaces = 20,
                     Description = "Indulge in elegance and comfort at this centrally located hotel, featuring top-notch amenities and easy access to London's historical landmarks"
                 },
 
@@ -42,7 +65,6 @@ namespace BlazorHotelBooking.Server.Data
                     SBPrice = 80,
                     DBPrice = 120,
                     FamPrice = 150,
-                    Spaces = 20,
                     Description = " Enjoy affordable comfort with stunning seafront views, ideally situated for exploring Brighton’s vibrant beach and pier attractions."
                 },
 
@@ -53,7 +75,6 @@ namespace BlazorHotelBooking.Server.Data
                     SBPrice = 180,
                     DBPrice = 400,
                     FamPrice = 520,
-                    Spaces = 20,
                     Description = "A charming, budget-friendly hotel on Brighton’s seafront, offering cozy accommodations with easy access to the city's lively nightlife and cultural sites"
                 },
 
@@ -64,7 +85,6 @@ namespace BlazorHotelBooking.Server.Data
                     SBPrice = 180,
                     DBPrice = 400,
                     FamPrice = 520,
-                    Spaces = 20,
                     Description = "Modern and stylish, this hotel provides a comfortable base to discover Brighton, conveniently close to the beach and the buzzing city center."
                 },
 
@@ -75,7 +95,6 @@ namespace BlazorHotelBooking.Server.Data
                     SBPrice = 90,
                     DBPrice = 100,
                     FamPrice = 155,
-                    Spaces = 20,
                     Description = "Nestled in the Scottish Highlands, this inn offers a serene getaway with scenic views, perfect for outdoor enthusiasts and nature lovers"
                 }
             );

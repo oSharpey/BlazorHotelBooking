@@ -4,6 +4,7 @@ using BlazorHotelBooking.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorHotelBooking.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20231224151037_authstuff2")]
+    partial class authstuff2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -115,6 +118,9 @@ namespace BlazorHotelBooking.Server.Migrations
                     b.Property<decimal>("SBPrice")
                         .HasColumnType("decimal(18,2");
 
+                    b.Property<int>("Spaces")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.ToTable("Hotels");
@@ -127,7 +133,8 @@ namespace BlazorHotelBooking.Server.Migrations
                             Description = "Experience luxury in the heart of the city, with sophisticated rooms and a stone's throw from London's major attractions and shopping districts.",
                             FamPrice = 950m,
                             Name = "Hilton London Hotel",
-                            SBPrice = 375m
+                            SBPrice = 375m,
+                            Spaces = 20
                         },
                         new
                         {
@@ -136,7 +143,8 @@ namespace BlazorHotelBooking.Server.Migrations
                             Description = "Indulge in elegance and comfort at this centrally located hotel, featuring top-notch amenities and easy access to London's historical landmarks",
                             FamPrice = 900m,
                             Name = "London Marriott Hotel",
-                            SBPrice = 300m
+                            SBPrice = 300m,
+                            Spaces = 20
                         },
                         new
                         {
@@ -145,7 +153,8 @@ namespace BlazorHotelBooking.Server.Migrations
                             Description = " Enjoy affordable comfort with stunning seafront views, ideally situated for exploring Brighton’s vibrant beach and pier attractions.",
                             FamPrice = 150m,
                             Name = "Travelodge Brighton Seafront",
-                            SBPrice = 80m
+                            SBPrice = 80m,
+                            Spaces = 20
                         },
                         new
                         {
@@ -154,7 +163,8 @@ namespace BlazorHotelBooking.Server.Migrations
                             Description = "A charming, budget-friendly hotel on Brighton’s seafront, offering cozy accommodations with easy access to the city's lively nightlife and cultural sites",
                             FamPrice = 520m,
                             Name = "Kings Hotel Brighton",
-                            SBPrice = 180m
+                            SBPrice = 180m,
+                            Spaces = 20
                         },
                         new
                         {
@@ -163,7 +173,8 @@ namespace BlazorHotelBooking.Server.Migrations
                             Description = "Modern and stylish, this hotel provides a comfortable base to discover Brighton, conveniently close to the beach and the buzzing city center.",
                             FamPrice = 520m,
                             Name = "Leonardo Hotel Brighton",
-                            SBPrice = 180m
+                            SBPrice = 180m,
+                            Spaces = 20
                         },
                         new
                         {
@@ -172,7 +183,8 @@ namespace BlazorHotelBooking.Server.Migrations
                             Description = "Nestled in the Scottish Highlands, this inn offers a serene getaway with scenic views, perfect for outdoor enthusiasts and nature lovers",
                             FamPrice = 155m,
                             Name = "Nevis Bank Inn, Fort William",
-                            SBPrice = 90m
+                            SBPrice = 90m,
+                            Spaces = 20
                         });
                 });
 
@@ -201,22 +213,6 @@ namespace BlazorHotelBooking.Server.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "1",
-                            ConcurrencyStamp = "58e2b328-5446-4c73-92b3-0d8a656a4e83",
-                            Name = "User",
-                            NormalizedName = "USER"
-                        },
-                        new
-                        {
-                            Id = "2",
-                            ConcurrencyStamp = "e377a34a-ad96-48b1-a9de-d2ef04c143d9",
-                            Name = "Admin",
-                            NormalizedName = "ADMIN"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

@@ -1,8 +1,10 @@
 ﻿@page "/hoteledit"
 @page "/hoteledit/{id:int}"
 @using BlazorHotelBooking.Shared
+@using Microsoft.AspNetCore.Authorization
 @inject HttpClient http
 @inject NavigationManager NavigationManager
+@attribute [Authorize(Roles="Admin")]
 
 @if (Id is null)
 {
@@ -38,10 +40,6 @@ else
         <InputNumber id="FamPrice" @bind-Value="selectedHotel.FamPrice" class="form-control" />
     </div>
     <div>
-        <label for="Spaces">Spaces</label>
-        <InputNumber id="Spaces" @bind-Value="selectedHotel.Spaces" class="form-control" />
-    </div>
-    <div>
         <label for="Description">Description</label>
         <InputText id="Description" @bind-Value="selectedHotel.Description" class="form-control" />
     </div>
@@ -63,7 +61,7 @@ else
     {
         if (Id is not null)
         {
-            var result = await http.GetFromJsonAsync<Hotel>($"api/hotel/{Id}");
+            var result = await http.GetFromJsonAsync<Hotel>($"api/Admin/hotel/{Id}");
             if (result is not null)
             {
                 selectedHotel = result;
@@ -73,20 +71,20 @@ else
 
     async Task DeleteHotel()
     {
-        await http.DeleteAsync($"api/hotel/{Id}");
-        NavigationManager.NavigateTo("/hoteladmin");
+        await http.DeleteAsync($"api/Admin/hotel/{Id}");
+        NavigationManager.NavigateTo("/admin");
     }
 
     async Task HandleSubmit()
     {
         if(Id is null)
         {
-            await http.PostAsJsonAsync("/api/hotel", selectedHotel);
+            await http.PostAsJsonAsync("/api/Admin/hotel", selectedHotel);
         }
         else
         {
-            await http.PutAsJsonAsync($"api/hotel/{Id}", selectedHotel);
+            await http.PutAsJsonAsync($"api/Admin/hotel/{Id}", selectedHotel);
         }
-        NavigationManager.NavigateTo("/hoteladmin");
+        NavigationManager.NavigateTo("/admin");
     }
 }
