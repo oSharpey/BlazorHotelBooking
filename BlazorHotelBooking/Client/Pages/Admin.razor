@@ -1,0 +1,71 @@
+﻿@page "/admin"
+@using BlazorHotelBooking.Shared
+@using Microsoft.AspNetCore.Authorization
+@inject HttpClient http
+@inject NavigationManager NavigationManager
+@attribute [Authorize(Roles = "Admin")]
+
+<h3>Admin Page</h3>
+<button @onclick="AddHotel" class="btn btn-primary">Add Hotel</button>
+<br />
+
+@if (hotels is null)
+{
+    <span>Loading Hotels…</span>
+
+}
+else
+{
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Single Bed</th>
+                <th>Double Bed</th>
+                <th>Family Room</th>
+            </tr>
+
+        </thead>
+        <tbody>
+            @foreach (var h in hotels)
+            {
+                <tr>
+                    <td width="5%">@h.Id</td>
+                    <td width="5%">@h.Name</td>
+                    <td width="5%">@h.SBPrice</td>
+                    <td width="5%">@h.DBPrice</td>
+                    <td width="5%">@h.FamPrice</td>
+                    <td width="5%">
+                        <button @onclick="(() => EditHotel(h.Id))" class="btn btn-primary">Edit</button>
+                    </td>
+                </tr>
+
+            }
+        </tbody>
+    </table>
+}
+
+
+@code {
+    List<Hotel>? hotels;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await http.GetFromJsonAsync<List<Hotel>>("/api/Admin/hotel");
+        if (result != null)
+        {
+            hotels = result;
+        }
+    }
+
+    void AddHotel()
+    {
+        NavigationManager.NavigateTo("/hoteledit");
+    }
+
+    void EditHotel(int id)
+    {
+        NavigationManager.NavigateTo($"/hoteledit/{id}");
+    }
+}
