@@ -1,7 +1,10 @@
 ﻿@page "/hotels/{id}"
 @using BlazorHotelBooking.Shared;
 @using Microsoft.AspNetCore.Authorization
+@using Syncfusion.Blazor.DropDowns;
+@using System.ComponentModel.DataAnnotations;
 @inject HttpClient http
+@inject NavigationManager NavigationManager
 @attribute [Authorize]
 
 
@@ -10,32 +13,102 @@
         <h2 class="mb-0">@selectedHotel.Name</h2>
         <p>@selectedHotel.Description</p>
         <h4 class="price">
-            Single Room: £@selectedHotel.SBPrice
+            Single Room: £@selectedHotel.SBPrice (per night)
         </h4>
-        <button class="btn btn-primary"><i class="oi oi-cart">&nbsp;&nbsp;&nbsp; Book Room</i></button>
         <h4 class="price">
-            Double Room: £@selectedHotel.DBPrice
+            Double Room: £@selectedHotel.DBPrice (per night)
         </h4>
-        <button class="btn btn-primary"><i class="oi oi-cart">&nbsp;&nbsp;&nbsp; Book Room</i></button>
         <h4 class="price">
-            Family Room: £@selectedHotel.FamPrice
+            Family Room: £@selectedHotel.FamPrice (per night)
         </h4>
-        <button class="btn btn-primary"><i class="oi oi-cart">&nbsp;&nbsp;&nbsp; Book Room</i></button>
+        <button @onclick="ShowBookingForm" class="btn btn-primary"><i class="oi oi-cart">&nbsp;&nbsp;&nbsp; Book Hotel</i></button>
     </div>
 </div>
 
+@if(showBookingForm)
+{
+    <div class="backgroundPopupBox">
+        <div class="popupCreate">
+            <EditForm Model=@newBooking OnValidSubmit=BookHotel>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+               
+                <div class="form-group">
+                    <label class="control-label">Check-In Date</label>
+                    <InputDate @bind-Value="newBooking.CheckIn" min="@min" max="@max" Placeholder="Enter Date" />
+                    <ValidationMessage For="@(() => newBooking.CheckIn)" />
+                </div>
+                <div class="form-group mt-3 col-sm-10">
+                    <label class="control-label">Room Type</label>
+                    <InputSelect id="roomType" @bind-Value="newBooking.RoomType" placeholder="Room Type">
+                        <option value="">---</option>
+                        @foreach (var room in roomType)
+                        {
+                            <option value="@room">@room</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="@(() => newBooking.RoomType)" />
+                </div>
+                <div class="form-group mt-3">
+                    <label class="control-label">Number of nights</label>
+                    <InputNumber id="NumOfNights" @bind-Value="newBooking.NumberOfNights" class="form-control" />
+                    <ValidationMessage For="@(() => newBooking.NumberOfNights)" />
+                </div>
+                
+                @{
+                    switch (newBooking.RoomType)
+                    {
+                        case "Single":
+                            newBooking.TotalPrice = newBooking.NumberOfNights * selectedHotel.SBPrice;
+                            break;
+                        case "Double":
+                            newBooking.TotalPrice = newBooking.NumberOfNights * selectedHotel.DBPrice;
+                            break;
+                        case "Family":
+                            newBooking.TotalPrice = newBooking.NumberOfNights * selectedHotel.FamPrice;
+                            break;
+
+                    }
+                    newBooking.DepositAmountPaid = newBooking.TotalPrice / 5 ;
+                }
+                
+
+                <div>Total Price is £@newBooking.TotalPrice</div>
+                <div>Total to pay today (20%) £@newBooking.DepositAmountPaid</div>
+
+                <button type="button" class="btn btn-success" @onclick="BookHotel">Book</button>
+
+            </EditForm>
+
+            <div class="form-group">
+                <button class="btn btn-danger" @onclick="ClosePopup">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+}
+
+
 @code {
         private Hotel selectedHotel = new Hotel();
-
+        private HotelBooking newBooking = new HotelBooking();
+        private bool showBookingForm = false;
+        private string min;
+        private string max;
 
         [Parameter]
         public string? Id { get; set; }
 
         List<Hotel> hotels = new List<Hotel>();
+        List<string> roomType = new List<string>() { "Single", "Double", "Family" };
 
 
         protected override async Task OnInitializedAsync()
         {
+            min = DateOnly.FromDateTime(DateTime.Now.Date.AddDays(1)).ToString("yyyy-MM-dd");
+            max = DateOnly.FromDateTime(DateTime.Now.Date.AddYears(5)).ToString("yyyy-MM-dd");
+
+
             var result = await http.GetFromJsonAsync<List<Hotel>>("/api/hotel");
             if (result != null)
             {
@@ -43,5 +116,20 @@
             }
 
             selectedHotel = hotels.FirstOrDefault(h => h.Id == Int32.Parse(Id));
+        }
+
+
+        private void ShowBookingForm()
+        {
+            showBookingForm = true;
+        }
+
+        private void BookHotel()
+        {
+        }
+
+        private void ClosePopup()
+        {
+            showBookingForm = false;
         }
  }
