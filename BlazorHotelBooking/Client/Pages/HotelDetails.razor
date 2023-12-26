@@ -1,8 +1,11 @@
 ﻿@page "/hotels/{id}"
 @using BlazorHotelBooking.Shared;
-@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Authorization;
+@using Microsoft.AspNetCore.Http;
 @using Syncfusion.Blazor.DropDowns;
 @using System.ComponentModel.DataAnnotations;
+@using System.Security.Claims
+@inject IHttpContextAccessor httpContextAccessor
 @inject HttpClient http
 @inject NavigationManager NavigationManager
 @attribute [Authorize]
@@ -10,6 +13,7 @@
 
 <div class="media">
     <div class="media-body">
+        <h1> Welcome  </h1>
         <h2 class="mb-0">@selectedHotel.Name</h2>
         <p>@selectedHotel.Description</p>
         <h4 class="price">
@@ -70,8 +74,13 @@
 
                     }
                     newBooking.DepositAmountPaid = newBooking.TotalPrice / 5 ;
+                    newBooking.CheckOut = newBooking.CheckIn.AddDays(newBooking.NumberOfNights);
+                  
                 }
-                
+
+                <div>Check In Date: @newBooking.CheckIn.ToString("dd/MM/yyyy")</div>
+                <div>Check Out Date: @newBooking.CheckOut.ToString("dd/MM/yyyy")</div>
+
 
                 <div>Total Price is £@newBooking.TotalPrice</div>
                 <div>Total to pay today (20%) £@newBooking.DepositAmountPaid</div>
@@ -90,46 +99,56 @@
 
 
 @code {
-        private Hotel selectedHotel = new Hotel();
-        private HotelBooking newBooking = new HotelBooking();
-        private bool showBookingForm = false;
-        private string min;
-        private string max;
+    private Hotel selectedHotel = new Hotel();
+    private HotelBooking newBooking = new HotelBooking();
+    private bool showBookingForm = false;
+    private string min;
+    private string max;
+    private string userId;
+    private string? userEmail;
 
-        [Parameter]
-        public string? Id { get; set; }
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
 
-        List<Hotel> hotels = new List<Hotel>();
-        List<string> roomType = new List<string>() { "Single", "Double", "Family" };
+    [Parameter]
+    public string? Id { get; set; }
 
+    List<Hotel> hotels = new List<Hotel>();
+    List<string> roomType = new List<string>() { "Single", "Double", "Family" };
 
-        protected override async Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
+    {
+        min = DateOnly.FromDateTime(DateTime.Now.Date.AddDays(1)).ToString("yyyy-MM-dd");
+        max = DateOnly.FromDateTime(DateTime.Now.Date.AddYears(5)).ToString("yyyy-MM-dd");
+
+        var authState = await authenticationState;
+        var user = authState?.User;
+        userId = user?.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        userEmail = user?.Identity?.Name;
+
+        var result = await http.GetFromJsonAsync<List<Hotel>>("/api/hotel");
+        if (result != null)
         {
-            min = DateOnly.FromDateTime(DateTime.Now.Date.AddDays(1)).ToString("yyyy-MM-dd");
-            max = DateOnly.FromDateTime(DateTime.Now.Date.AddYears(5)).ToString("yyyy-MM-dd");
-
-
-            var result = await http.GetFromJsonAsync<List<Hotel>>("/api/hotel");
-            if (result != null)
-            {
-                hotels = result;
-            }
-
-            selectedHotel = hotels.FirstOrDefault(h => h.Id == Int32.Parse(Id));
+            hotels = result;
         }
 
+        selectedHotel = hotels.FirstOrDefault(h => h.Id == Int32.Parse(Id));
+    }
 
-        private void ShowBookingForm()
-        {
-            showBookingForm = true;
-        }
+    private void ShowBookingForm()
+    {
+        showBookingForm = true;
+    }
 
-        private void BookHotel()
-        {
-        }
+    private void BookHotel()
+    {
+        newBooking.HotelId = selectedHotel.Id;
+        newBooking.UserId = userId;
+        newBooking.UserEmail = userEmail;
+    }
 
-        private void ClosePopup()
-        {
-            showBookingForm = false;
-        }
+    private void ClosePopup()
+    {
+        showBookingForm = false;
+    }
  }

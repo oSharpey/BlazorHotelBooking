@@ -25,6 +25,7 @@ namespace BlazorHotelBooking.Shared
         public decimal DepositAmountPaid { get; set; }
         public string UserId { get; set; }
         public string? UserEmail { get; set; }
-        public string? UserPhone { get; set; }
+        public DateOnly BookingDate { get; set; } = DateOnly.FromDateTime(DateTime.Now.Date);
+        // public string? UserPhone { get; set; }
     }
 }
