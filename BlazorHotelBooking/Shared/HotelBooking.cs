@@ -15,8 +15,8 @@ namespace BlazorHotelBooking.Shared
         [Required(ErrorMessage = "Room Type required.")]
         public string RoomType { get; set; }
         [Required(ErrorMessage = "Check-In Date required.")]
-        public DateOnly CheckIn { get; set; } = DateOnly.FromDateTime(DateTime.Now.Date.AddDays(1));
-        public DateOnly CheckOut { get; set; }
+        public DateTime CheckIn { get; set; } = DateTime.Now.Date.AddDays(1);
+        public DateTime CheckOut { get; set; }
         [Required(ErrorMessage = "Number of Nigts required.")]
         public int NumberOfNights { get; set; }
         [Column(TypeName = "decimal(18,2")]
@@ -25,7 +25,7 @@ namespace BlazorHotelBooking.Shared
         public decimal DepositAmountPaid { get; set; }
         public string UserId { get; set; }
         public string? UserEmail { get; set; }
-        public DateOnly BookingDate { get; set; } = DateOnly.FromDateTime(DateTime.Now.Date);
+        public DateTime BookingDate { get; set; } = DateTime.Now.Date;
         // public string? UserPhone { get; set; }
     }
 }
