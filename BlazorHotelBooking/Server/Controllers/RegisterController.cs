@@ -24,7 +24,8 @@ namespace BlazorHotelBooking.Server.Controllers
             {
                 UserName = model.Email,
                 Email = model.Email,
-                PassportNumber = model.PassportNumber
+                PassportNumber = model.PassportNumber,
+                PhoneNumber = model.PhoneNumber
             };
 
             var result = await _userManager.CreateAsync(user, model.Password);
@@ -43,6 +44,6 @@ namespace BlazorHotelBooking.Server.Controllers
             }
 
             return Ok(new RegisterResult { Successful = true});
-        }   
+        }
     }
 }
