@@ -209,6 +209,9 @@ namespace BlazorHotelBooking.Server.Migrations
                     b.Property<decimal>("TotalPrice")
                         .HasColumnType("decimal(18,2");
 
+                    b.Property<string>("UserEmail")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -248,14 +251,14 @@ namespace BlazorHotelBooking.Server.Migrations
                         new
                         {
                             Id = "1",
-                            ConcurrencyStamp = "a2e7fc4e-1499-42d9-a9e4-80a82b2378a6",
+                            ConcurrencyStamp = "c49239c0-a656-4669-8ec7-0c99fd2676ea",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = "2",
-                            ConcurrencyStamp = "9a5f784b-4320-4b52-ac82-60f34b14c67b",
+                            ConcurrencyStamp = "e4843ecb-86a4-43e6-8625-b01f0378b555",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
