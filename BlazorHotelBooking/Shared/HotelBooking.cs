@@ -24,7 +24,6 @@ namespace BlazorHotelBooking.Shared
         [Column(TypeName = "decimal(18,2")]
         public decimal DepositAmountPaid { get; set; }
         public string UserId { get; set; }
-        public string? UserEmail { get; set; }
         public DateTime BookingDate { get; set; } = DateTime.Now.Date;
         // public string? UserPhone { get; set; }
     }
