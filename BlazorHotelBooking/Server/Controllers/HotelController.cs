@@ -4,12 +4,15 @@ using Microsoft.AspNetCore.Mvc;
 using BlazorHotelBooking.Shared;
 using BlazorHotelBooking.Server.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace BlazorHotelBooking.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "User")]
+
     public class HotelController : ControllerBase
     {
         private readonly DataContext _context;

@@ -105,7 +105,6 @@
     private string min;
     private string max;
     private string userId;
-    private string? userEmail;
 
     [CascadingParameter]
     private Task<AuthenticationState>? authenticationState { get; set; }
@@ -139,10 +138,16 @@
         showBookingForm = true;
     }
 
-    private void BookHotel()
+    async Task BookHotel()
     {
         newBooking.HotelId = selectedHotel.Id;
         newBooking.UserId = userId;
+
+       await http.PostAsJsonAsync("/api/bookings/hotel", newBooking);
+        
+       ClosePopup();
+       NavigationManager.NavigateTo("/mybookings");
+       
     }
 
     private void ClosePopup()
