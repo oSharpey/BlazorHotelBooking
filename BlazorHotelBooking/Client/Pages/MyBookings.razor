@@ -1,0 +1,84 @@
+﻿@page "/mybookings"
+@using BlazorHotelBooking.Shared.Models
+@using Microsoft.AspNetCore.Authorization
+@using System.Security.Claims
+@inject HttpClient http
+@attribute [Authorize]
+
+<h3>MyBookings</h3>
+
+
+<h2>Hotels</h2>
+@if (hotelBookings is null)
+{
+    <h3>Loading Hotels…</h3>
+ 
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Hotel</th>
+                <th>Room Type</th>
+                <th>Check In Date</th>
+                <th>Check Out Date</th>
+                <th>Number of Nights</th>
+                <th>Amount Paid so Far</th>
+                <th>Total Cost</th>
+            </tr>
+
+        </thead>
+        <tbody>
+            @foreach (var h in hotelBookings)
+            {
+                <tr>
+                    <td width="5%">@h.hotelName</td>
+                    <td width="5%">@h.RoomType Room</td>
+                    <td width="5%">@h.CheckIn.ToString("dd/MM/yyyy")</td>
+                    <td width="5%">@h.CheckOut.ToString("dd/MM/yyyy")</td>
+                    <td width="5%">@h.NumberOfNights Nights</td>
+                    <td width="5%">£@h.DepositAmountPaid</td>
+                    <td width="5%">£@h.TotalPrice</td>
+                    <td width="5%">
+                        <button  class="btn btn-primary">Modify</button>
+                    </td>
+                    <td width="5%">
+                        <button  class="btn btn-danger" disabled=true>Cancel</button>
+                    </td>
+                    <td width="5%">
+                        <button class="btn btn-success">Pay More</button>
+                    </td>
+                </tr>
+
+            }
+        </tbody>
+    </table>
+}
+
+
+@code {
+    
+   
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
+    private List<HotelBookingViewModel>? hotelBookings;
+    private string userId;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        var authState = await authenticationState;
+        var user = authState?.User;
+        userId = user?.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+        var result = await http.GetFromJsonAsync<List<HotelBookingViewModel>>($"api/bookings/hotel/userbooking?userId={userId}");
+        if (result != null)
+        {
+           hotelBookings = result;
+        }
+    }
+
+
+
+}

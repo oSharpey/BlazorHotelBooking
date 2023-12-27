@@ -12,11 +12,10 @@
 @if (hotels is null)
 {
     <span>Loading Hotels…</span>
-
 }
 else
 {
-    <table>
+    <table class="table">
         <thead>
             <tr>
                 <th>ID</th>
@@ -59,12 +58,12 @@ else
         }
     }
 
-    void AddHotel()
+    private void AddHotel()
     {
         NavigationManager.NavigateTo("/hoteledit");
     }
 
-    void EditHotel(int id)
+    private void EditHotel(int id)
     {
         NavigationManager.NavigateTo($"/hoteledit/{id}");
     }
