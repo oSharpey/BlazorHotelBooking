@@ -124,7 +124,6 @@
         var authState = await authenticationState;
         var user = authState?.User;
         userId = user?.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-        userEmail = user?.Identity?.Name;
 
         var result = await http.GetFromJsonAsync<List<Hotel>>("/api/hotel");
         if (result != null)
@@ -144,7 +143,6 @@
     {
         newBooking.HotelId = selectedHotel.Id;
         newBooking.UserId = userId;
-        newBooking.UserEmail = userEmail;
     }
 
     private void ClosePopup()
