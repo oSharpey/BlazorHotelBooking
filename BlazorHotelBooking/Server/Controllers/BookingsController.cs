@@ -24,10 +24,20 @@ namespace BlazorHotelBooking.Server.Controllers
         [HttpGet("hotel/userbooking")]
         public async Task<ActionResult<List<HotelBooking>>> GetAllBookingsWithId(string userId)
         {
+            var query = from hotel in _context.Hotels
+                        join booking in _context.HotelBookings on hotel.Id equals booking.HotelId
+                        where booking.UserId == userId
+                        select new { 
+                            hotel.Name, 
+                            booking.BookingDate, 
+                            booking.CheckIn, 
+                            booking.CheckOut, 
+                            booking.NumberOfNights, 
+                            booking.TotalPrice, 
+                            booking.DepositAmountPaid 
+                        };
 
-            List<HotelBooking> list = _context.HotelBookings.Where(x => x.UserId == userId).ToList();
-
-            return Ok(list);
+            return Ok(query);
         }
 
 
