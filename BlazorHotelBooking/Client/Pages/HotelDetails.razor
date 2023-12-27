@@ -85,6 +85,14 @@
                 <div>Total Price is £@newBooking.TotalPrice</div>
                 <div>Total to pay today (20%) £@newBooking.DepositAmountPaid</div>
 
+
+                @if(showOverlap)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        <p>There are no more spaces for this room on these dates please select new dates.</p>
+                    </div>
+                }
+
                 <button type="button" class="btn btn-success" @onclick="BookHotel">Book</button>
 
             </EditForm>
@@ -105,6 +113,8 @@
     private string min;
     private string max;
     private string userId;
+    private int numOfOverlap;
+    private bool showOverlap = false;
 
     [CascadingParameter]
     private Task<AuthenticationState>? authenticationState { get; set; }
@@ -140,13 +150,25 @@
 
     async Task BookHotel()
     {
-        newBooking.HotelId = selectedHotel.Id;
-        newBooking.UserId = userId;
 
-       await http.PostAsJsonAsync("/api/bookings/hotel", newBooking);
+        //code to check if the newbooking overlaps with existing bookings
+        numOfOverlap = await http.GetFromJsonAsync<int>($"/api/bookings/hotel/overlap?checkIn={newBooking.CheckIn}&checkOut={newBooking.CheckOut}&hotelId={selectedHotel.Id}&roomType={newBooking.RoomType}");
+
+        if (numOfOverlap > 20)
+        {
+            showOverlap = true;
+        } else 
+        {
+            newBooking.HotelId = selectedHotel.Id;
+            newBooking.UserId = userId;
+
+            await http.PostAsJsonAsync("/api/bookings/hotel/book", newBooking);
+
+            ClosePopup();
+            NavigationManager.NavigateTo("/mybookings");
+        }
+
         
-       ClosePopup();
-       NavigationManager.NavigateTo("/mybookings");
        
     }
 

@@ -11,7 +11,7 @@ namespace BlazorHotelBooking.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "User")]
+   // [Authorize(Roles = "User")]
     public class BookingsController : ControllerBase
     {
 
@@ -45,8 +45,31 @@ namespace BlazorHotelBooking.Server.Controllers
         }
 
 
+        //check if bookings overlap
+        [HttpGet("hotel/overlap")]
+        public ActionResult<int> CheckIfBookingOverlaps(DateTime checkIn, DateTime checkOut, int hotelId, string roomType)
+        {
+            var overlap =  _context.HotelBookings.Where(x => 
+                x.CheckIn <= checkOut && 
+                x.CheckOut >= checkIn && 
+                x.RoomType == roomType &&
+                x.HotelId == hotelId
+            ).ToList().Count();
 
-        [HttpPost("hotel")]
+            return Ok(overlap);
+        }
+
+        [HttpGet("hotel/booking/numBookings")]
+        public async Task<ActionResult<int>> GetNumberOfBookings()
+        {
+            
+
+            return Ok();
+        }
+
+
+
+        [HttpPost("hotel/book")]
         public async Task<ActionResult<List<HotelBooking>>> AddBooking(HotelBooking hotl)
         {
             _context.HotelBookings.Add(hotl);
