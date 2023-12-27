@@ -17,5 +17,7 @@ namespace BlazorHotelBooking.Shared.Models
 
         [Required, Display(Name = "Passport Number")]
         public string? PassportNumber { get; set; }
+        [Required, Display(Name = "Phone Number")]
+        public string? PhoneNumber { get; set; }
     }
 }
