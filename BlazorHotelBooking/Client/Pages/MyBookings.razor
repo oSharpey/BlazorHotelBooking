@@ -43,9 +43,6 @@ else
                 {
                     disableModify = true;
                 }
-
-                
-
                 <tr>
                     <td width="5%">@h.hotelName @datediff.Days</td>
                     <td width="5%">@h.RoomType Room</td>
@@ -61,12 +58,28 @@ else
                         <button class="btn btn-danger" disabled="@disableCancel" @onclick="() => CancelBooking(h.bookingId)">Cancel</button>
                     </td>
                     <td width="5%">
-                        <button class="btn btn-success">Pay More</button>
+                        <button class="btn btn-success" @onclick="() => ShowPayPopup(h.bookingId, h.DepositAmountPaid, h.TotalPrice)">Pay Remainder</button>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
+}
+
+@{
+    if (showPayPopup)
+    {
+        var remainder = totalToPay - currentlyPaid;
+
+        <div class="backgroundPopupBox">
+            <div class="popupCreate">
+            <h3>Pay Remainder</h3
+                <p>Are you sure you want to pay the remainder of this booking? It will cost you £@remainder </p>
+                <button class="btn btn-success" @onclick="() => PayRemainder(bookingId)">Yes</button>
+                <button class="btn btn-danger" @onclick="ClosePopup">No</button>
+            </div>
+        </div>   
+    }
 }
 
 
@@ -79,6 +92,10 @@ else
     private string userId;
     private bool disableCancel = false;
     private bool disableModify = false;
+    private bool showPayPopup = false;
+    private string bookingId;
+    private decimal currentlyPaid, totalToPay;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -103,6 +120,19 @@ else
     private void ModifyBooking(string id)
     {
         NavigationManager.NavigateTo($"/editbooking/hotel/{id}");
+    }
+
+    private void ShowPayPopup(string id, decimal depoist, decimal total)
+    {
+        showPayPopup = true;
+        bookingId = id;
+        currentlyPaid = depoist;
+        totalToPay = total;
+    }
+
+    private void PayRemainder(string id)
+    {
+        //code to pay remainder
     }
 
 }
