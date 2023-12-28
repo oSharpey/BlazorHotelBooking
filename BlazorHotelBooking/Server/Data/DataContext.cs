@@ -17,6 +17,9 @@ namespace BlazorHotelBooking.Server.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
+
+
+
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<IdentityRole>().HasData(new IdentityRole

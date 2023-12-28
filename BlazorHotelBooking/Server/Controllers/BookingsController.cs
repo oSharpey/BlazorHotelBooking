@@ -30,6 +30,7 @@ namespace BlazorHotelBooking.Server.Controllers
                         join booking in _context.HotelBookings on hotel.Id equals booking.HotelId
                         where booking.UserId == userId
                         select new HotelBookingViewModel { 
+                            bookingId = booking.Id,
                             hotelName = hotel.Name,
                             RoomType = booking.RoomType,  
                             CheckIn = booking.CheckIn,  
@@ -59,12 +60,27 @@ namespace BlazorHotelBooking.Server.Controllers
             return Ok(overlap);
         }
 
-        [HttpGet("hotel/booking/numBookings")]
-        public async Task<ActionResult<int>> GetNumberOfBookings()
+        [HttpDelete("hotel/{id}")]
+        public async Task<ActionResult<List<Hotel>>> DeleteHotelBooking(string id)
         {
-            
+            var dbHotel = await _context.HotelBookings.FindAsync(id);
+            var today = DateTime.Now;
+            var datediff = dbHotel.CheckIn - today;
 
-            return Ok();
+            if (dbHotel == null)
+            {
+                return NotFound("This hotel does not exist");
+            }
+
+            if (datediff.Days < 5)
+            {
+                return BadRequest("You cannot cancel this booking");
+            }
+           
+            _context.HotelBookings.Remove(dbHotel);
+            await _context.SaveChangesAsync();
+
+            return Ok("Booking Deleted");
         }
 
 

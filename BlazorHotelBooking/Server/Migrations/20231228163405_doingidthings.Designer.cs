@@ -4,6 +4,7 @@ using BlazorHotelBooking.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorHotelBooking.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20231228163405_doingidthings")]
+    partial class doingidthings
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -178,7 +181,7 @@ namespace BlazorHotelBooking.Server.Migrations
 
             modelBuilder.Entity("BlazorHotelBooking.Shared.HotelBooking", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<string>("duplicateId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("BookingDate")
@@ -196,6 +199,9 @@ namespace BlazorHotelBooking.Server.Migrations
                     b.Property<int>("HotelId")
                         .HasColumnType("int");
 
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
                     b.Property<int>("NumberOfNights")
                         .HasColumnType("int");
 
@@ -210,7 +216,7 @@ namespace BlazorHotelBooking.Server.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("duplicateId");
 
                     b.ToTable("HotelBookings");
                 });
@@ -245,14 +251,14 @@ namespace BlazorHotelBooking.Server.Migrations
                         new
                         {
                             Id = "1",
-                            ConcurrencyStamp = "288e07a7-8e67-4b58-9c8f-d0555be594bd",
+                            ConcurrencyStamp = "69b342eb-31af-4ae6-b240-3439ea663210",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = "2",
-                            ConcurrencyStamp = "5c756df1-38dd-4ff4-8667-af7307928570",
+                            ConcurrencyStamp = "4325e93f-dee9-4344-81a0-df6c5a0a691e",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });

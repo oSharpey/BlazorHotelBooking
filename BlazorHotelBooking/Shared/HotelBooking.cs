@@ -10,7 +10,8 @@ namespace BlazorHotelBooking.Shared
 {
     public class HotelBooking
     {
-        public int Id { get; set; }
+        [Key]
+        public string Id { get; set; } = Guid.NewGuid().ToString();
         public int HotelId { get; set; }
         [Required(ErrorMessage = "Room Type required.")]
         public string RoomType { get; set; }

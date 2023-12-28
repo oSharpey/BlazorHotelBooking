@@ -11,6 +11,7 @@ namespace BlazorHotelBooking.Shared.Models
 {
     public class HotelBookingViewModel
     {
+        public string bookingId { get; set; }
         public string hotelName { get; set; }
         public string RoomType { get; set; }
         public DateTime CheckIn { get; set; } 
