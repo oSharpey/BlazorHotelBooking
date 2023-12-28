@@ -24,7 +24,7 @@ namespace BlazorHotelBooking.Server.Controllers
         }
 
         [HttpGet("hotel/userbooking")]
-        public async Task<ActionResult<List<HotelBookingViewModel>>> GetAllBookingsWithId(string userId)
+        public async Task<ActionResult<List<HotelBookingViewModel>>> GetAllBookingsWithUserId(string userId)
         {
             var query = from hotel in _context.Hotels
                         join booking in _context.HotelBookings on hotel.Id equals booking.HotelId
@@ -44,6 +44,48 @@ namespace BlazorHotelBooking.Server.Controllers
 
             return Ok(result);
         }
+
+        [HttpPut("hotel/{id}")]
+        public async Task<ActionResult<string>> UpdateHotel(string id, HotelBooking hotl)
+        {
+            var dbHotel = await _context.HotelBookings.FindAsync(id);
+
+            if (dbHotel == null)
+            {
+                return NotFound("This hotel does not exist");
+            }
+
+            dbHotel.Id = hotl.Id;
+            dbHotel.HotelId = hotl.HotelId;
+            dbHotel.RoomType = hotl.RoomType;
+            dbHotel.CheckIn = hotl.CheckIn;
+            dbHotel.CheckOut = hotl.CheckOut;
+            dbHotel.NumberOfNights = hotl.NumberOfNights;
+            dbHotel.TotalPrice = hotl.TotalPrice;
+            dbHotel.DepositAmountPaid = hotl.DepositAmountPaid;
+            dbHotel.BookingDate = hotl.BookingDate;
+            dbHotel.UserId = hotl.UserId;
+
+            _context.HotelBookings.Update(dbHotel);
+            await _context.SaveChangesAsync();
+
+            return Ok("Booking Updated Successfuly");
+        }
+
+
+        [HttpGet("hotel/{id}")]
+        public async Task<ActionResult<HotelBooking>> GetHotelBookingById(string id)
+        {
+            var dbhotel = await _context.HotelBookings.FindAsync(id);
+
+            if (dbhotel == null)
+            {
+                return NotFound("This hotel does not exist");
+            }
+
+            return Ok(dbhotel);
+        }
+
 
 
         //check if bookings overlap
@@ -82,8 +124,6 @@ namespace BlazorHotelBooking.Server.Controllers
 
             return Ok("Booking Deleted");
         }
-
-
 
         [HttpPost("hotel/book")]
         public async Task<ActionResult<List<HotelBooking>>> AddBooking(HotelBooking hotl)

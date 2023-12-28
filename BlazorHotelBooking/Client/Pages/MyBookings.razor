@@ -7,9 +7,6 @@
 @inject IJSRuntime JsRuntime
 @attribute [Authorize]
 
-<h3>MyBookings</h3>
-
-
 <h2>Hotels</h2>
 @if (hotelBookings is null)
 {
@@ -42,10 +39,11 @@ else
                 {
                     disableCancel = true;
                 }
-                else
+                if(datediff.Days < 14)
                 {
-                    disableCancel = false;
+                    disableModify = true;
                 }
+
                 
 
                 <tr>
@@ -57,7 +55,7 @@ else
                     <td width="5%">£@h.DepositAmountPaid</td>
                     <td width="5%">£@h.TotalPrice</td>
                     <td width="5%">
-                        <button  class="btn btn-primary">Modify</button>
+                        <button class="btn btn-primary" disabled="@disableModify" @onclick="() => ModifyBooking(h.bookingId)">Modify</button>
                     </td>
                     <td width="5%">
                         <button class="btn btn-danger" disabled="@disableCancel" @onclick="() => CancelBooking(h.bookingId)">Cancel</button>
@@ -79,7 +77,8 @@ else
     private Task<AuthenticationState>? authenticationState { get; set; }
     private List<HotelBookingViewModel>? hotelBookings;
     private string userId;
-    private bool disableCancel;
+    private bool disableCancel = false;
+    private bool disableModify = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -99,6 +98,11 @@ else
     {
         var result = await http.DeleteAsync($"api/bookings/hotel/{id}");
         NavigationManager.NavigateTo("/mybookings", true);
+    }
+
+    private void ModifyBooking(string id)
+    {
+        NavigationManager.NavigateTo($"/editbooking/hotel/{id}");
     }
 
 }
