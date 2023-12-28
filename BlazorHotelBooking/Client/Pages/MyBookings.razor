@@ -3,6 +3,8 @@
 @using Microsoft.AspNetCore.Authorization
 @using System.Security.Claims
 @inject HttpClient http
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
 @attribute [Authorize]
 
 <h3>MyBookings</h3>
@@ -32,8 +34,22 @@ else
         <tbody>
             @foreach (var h in hotelBookings)
             {
+                
+
+                var today = DateTime.Now;
+                var datediff = h.CheckIn - today;
+                if (datediff.Days < 5)
+                {
+                    disableCancel = true;
+                }
+                else
+                {
+                    disableCancel = false;
+                }
+                
+
                 <tr>
-                    <td width="5%">@h.hotelName</td>
+                    <td width="5%">@h.hotelName @datediff.Days</td>
                     <td width="5%">@h.RoomType Room</td>
                     <td width="5%">@h.CheckIn.ToString("dd/MM/yyyy")</td>
                     <td width="5%">@h.CheckOut.ToString("dd/MM/yyyy")</td>
@@ -44,13 +60,12 @@ else
                         <button  class="btn btn-primary">Modify</button>
                     </td>
                     <td width="5%">
-                        <button  class="btn btn-danger" disabled=true>Cancel</button>
+                        <button class="btn btn-danger" disabled="@disableCancel" @onclick="() => CancelBooking(h.bookingId)">Cancel</button>
                     </td>
                     <td width="5%">
                         <button class="btn btn-success">Pay More</button>
                     </td>
                 </tr>
-
             }
         </tbody>
     </table>
@@ -58,12 +73,13 @@ else
 
 
 @code {
-    
-   
+
+
     [CascadingParameter]
     private Task<AuthenticationState>? authenticationState { get; set; }
     private List<HotelBookingViewModel>? hotelBookings;
     private string userId;
+    private bool disableCancel;
 
     protected override async Task OnInitializedAsync()
     {
@@ -75,10 +91,14 @@ else
         var result = await http.GetFromJsonAsync<List<HotelBookingViewModel>>($"api/bookings/hotel/userbooking?userId={userId}");
         if (result != null)
         {
-           hotelBookings = result;
+            hotelBookings = result;
         }
     }
 
-
+    async Task CancelBooking(string id)
+    {
+        var result = await http.DeleteAsync($"api/bookings/hotel/{id}");
+        NavigationManager.NavigateTo("/mybookings", true);
+    }
 
 }

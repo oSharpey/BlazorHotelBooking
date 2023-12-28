@@ -4,6 +4,7 @@ using BlazorHotelBooking.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorHotelBooking.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20231228163826_removeoldid")]
+    partial class removeoldid
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -178,7 +181,7 @@ namespace BlazorHotelBooking.Server.Migrations
 
             modelBuilder.Entity("BlazorHotelBooking.Shared.HotelBooking", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<string>("duplicateId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("BookingDate")
@@ -210,7 +213,7 @@ namespace BlazorHotelBooking.Server.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("duplicateId");
 
                     b.ToTable("HotelBookings");
                 });
@@ -245,14 +248,14 @@ namespace BlazorHotelBooking.Server.Migrations
                         new
                         {
                             Id = "1",
-                            ConcurrencyStamp = "288e07a7-8e67-4b58-9c8f-d0555be594bd",
+                            ConcurrencyStamp = "a218429b-3be8-408a-a7c5-d7163e97593c",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = "2",
-                            ConcurrencyStamp = "5c756df1-38dd-4ff4-8667-af7307928570",
+                            ConcurrencyStamp = "a6ea050c-3975-4135-8937-fb9b860d5380",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
