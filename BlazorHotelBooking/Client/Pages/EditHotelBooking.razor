@@ -29,7 +29,58 @@
         <label for="NumOfNights">Number Of Nights</label>
         <InputNumber id="NumOfNights" @bind-Value="selectedBooking.NumberOfNights" class="form-control" />
     </div>
-    
+    @{
+        var currentDeposit = selectedBooking.DepositAmountPaid;
+        decimal currentTotal = selectedBooking.TotalPrice;
+        var currentCheckOut = selectedBooking.CheckOut;
+
+        switch (selectedBooking.RoomType)
+        {
+            case "Single":
+                newTotal = hotel.SBPrice * selectedBooking.NumberOfNights;
+                newDeposit = newTotal / 5;
+                newCheckOut = selectedBooking.CheckIn.AddDays(selectedBooking.NumberOfNights);
+                break;
+            case "Double":
+                newTotal = hotel.DBPrice * selectedBooking.NumberOfNights;
+                newDeposit = newTotal / 5;
+                newCheckOut = selectedBooking.CheckIn.AddDays(selectedBooking.NumberOfNights);
+                break;
+            case "Family":
+                newTotal = hotel.FamPrice * selectedBooking.NumberOfNights;
+                newDeposit = newTotal / 5;
+                newCheckOut = selectedBooking.CheckIn.AddDays(selectedBooking.NumberOfNights);
+                break;
+        }
+
+        if(newTotal > currentTotal)
+        {
+            var depositDiference = newDeposit - currentDeposit;
+            <div>
+                <p>The new total for this booking is £@newTotal</p>
+                <p>The new deposit for this booking is £@newDeposit</p>
+                <p>You will need to pay £@depositDiference more to complete this booking</p>
+            </div>
+           
+        }
+        else if(newTotal < currentTotal)
+        {
+            var depositDiference = currentDeposit - newDeposit;
+            <div>
+                <p>The new total for this booking is £@newTotal</p>
+                <p>The new deposit for this booking is £@newDeposit</p>
+                <p>You will be refunded £@depositDiference</p>
+            </div>
+            
+        }
+
+        if (showOverlap)
+        {
+            <div class="alert alert-danger" role="alert">
+                <p>There are no more spaces for this room on these dates please select new dates.</p>
+            </div>
+        }
+    }
     <button type="submit" class="btn btn-primary">Save</button>
 </EditForm> 
 
@@ -41,6 +92,11 @@
     private HotelBooking selectedBooking = new HotelBooking();
     private Hotel hotel = new Hotel();
     List<string> roomType = new List<string>() { "Single", "Double", "Family" };
+    private int currentNights;
+    private decimal newTotal, newDeposit;
+    private DateTime newCheckOut;
+    private bool showOverlap = false;
+    private int numOfOverlap;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -52,21 +108,34 @@
                 selectedBooking = result;
             }
         }
+
+        currentNights = selectedBooking.NumberOfNights;
+
         hotel = await http.GetFromJsonAsync<Hotel>($"api/hotel/{selectedBooking.HotelId}");
     }
 
     async Task HandleSubmit()
     {
-        if (Id is null)
+        selectedBooking.DepositAmountPaid = newDeposit;
+        selectedBooking.TotalPrice = newTotal;
+        selectedBooking.CheckOut = newCheckOut;
+
+        numOfOverlap = await http.GetFromJsonAsync<int>($"/api/bookings/hotel/overlap?checkIn={selectedBooking.CheckIn}&checkOut={selectedBooking.CheckOut}&hotelId={selectedBooking.HotelId}&roomType={selectedBooking.RoomType}");
+
+        if (numOfOverlap > 20)
         {
-           
+            showOverlap = true;
         }
         else
         {
-           
+            await http.PutAsJsonAsync($"api/bookings/hotel/{Id}", selectedBooking);
+            NavigationManager.NavigateTo("/mybookings");
         }
-        NavigationManager.NavigateTo("/mybookings");
     }
+
+
+
+       
 
     
 }
