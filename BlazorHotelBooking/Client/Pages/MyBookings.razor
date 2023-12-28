@@ -39,10 +39,11 @@ else
                 {
                     disableCancel = true;
                 }
-                else
+                if(datediff.Days < 14)
                 {
-                    disableCancel = false;
+                    disableModify = true;
                 }
+
                 
 
                 <tr>
@@ -54,7 +55,7 @@ else
                     <td width="5%">£@h.DepositAmountPaid</td>
                     <td width="5%">£@h.TotalPrice</td>
                     <td width="5%">
-                        <button  class="btn btn-primary" @onclick="() => ModifyBooking(h.bookingId)">Modify</button>
+                        <button class="btn btn-primary" disabled="@disableModify" @onclick="() => ModifyBooking(h.bookingId)">Modify</button>
                     </td>
                     <td width="5%">
                         <button class="btn btn-danger" disabled="@disableCancel" @onclick="() => CancelBooking(h.bookingId)">Cancel</button>
@@ -76,7 +77,8 @@ else
     private Task<AuthenticationState>? authenticationState { get; set; }
     private List<HotelBookingViewModel>? hotelBookings;
     private string userId;
-    private bool disableCancel;
+    private bool disableCancel = false;
+    private bool disableModify = false;
 
     protected override async Task OnInitializedAsync()
     {
