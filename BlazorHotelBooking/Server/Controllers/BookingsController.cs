@@ -38,12 +38,38 @@ namespace BlazorHotelBooking.Server.Controllers
                             NumberOfNights = booking.NumberOfNights,  
                             TotalPrice = booking.TotalPrice,
                             DepositAmountPaid = booking.DepositAmountPaid,
-                            BookingDate = booking.BookingDate
+                            BookingDate = booking.BookingDate,
+                            paidInfull = booking.paidInfull
                         };
             var result = await query.ToListAsync();
 
             return Ok(result);
         }
+
+        [HttpPut("hotel/payment/{id}")]
+        public async Task<ActionResult<string>> PayRemainder(string id)
+        {
+            var dbHotel = await _context.HotelBookings.FindAsync(id);
+
+            if (dbHotel == null)
+            {
+                return NotFound("This hotel does not exist");
+            }
+
+            if (dbHotel.paidInfull == true)
+            {
+                return BadRequest("You have already paid in full");
+            }
+
+            dbHotel.DepositAmountPaid = dbHotel.TotalPrice;
+            dbHotel.paidInfull = true;
+
+            _context.HotelBookings.Update(dbHotel);
+            await _context.SaveChangesAsync();
+            
+            return Ok("Payment Successful");
+        }
+
 
         [HttpPut("hotel/{id}")]
         public async Task<ActionResult<string>> UpdateHotel(string id, HotelBooking hotl)

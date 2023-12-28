@@ -53,25 +53,48 @@
                 break;
         }
 
-        if(newTotal > currentTotal)
+
+        if(selectedBooking.paidInfull)
         {
-            var depositDiference = newDeposit - currentDeposit;
-            <div>
-                <p>The new total for this booking is £@newTotal</p>
-                <p>The new deposit for this booking is £@newDeposit</p>
-                <p>You will need to pay £@depositDiference more to complete this booking</p>
-            </div>
-           
+            if (newTotal > currentTotal)
+            {
+                var totalDiference = newTotal - currentTotal;
+                <div>
+                    <p>The new total for this booking is £@newTotal</p>
+                    <p>You will need to pay £@totalDiference more to complete this booking</p>
+                </div>
+            }
+            else if (newTotal < currentTotal)
+            {
+                var totalDiference = currentTotal - newTotal;
+                <div>
+                    <p>The new total for this booking is £@newTotal</p>
+                    <p>You will be refunded £@totalDiference</p>
+                </div>
+            }
         }
-        else if(newTotal < currentTotal)
+        else
         {
-            var depositDiference = currentDeposit - newDeposit;
-            <div>
-                <p>The new total for this booking is £@newTotal</p>
-                <p>The new deposit for this booking is £@newDeposit</p>
-                <p>You will be refunded £@depositDiference</p>
-            </div>
-            
+            if (newTotal > currentTotal)
+            {
+                var depositDiference = newDeposit - currentDeposit;
+                <div>
+                    <p>The new total for this booking is £@newTotal</p>
+                    <p>The new deposit for this booking is £@newDeposit</p>
+                    <p>You will need to pay £@depositDiference more to complete this booking</p>
+                </div>
+
+            }
+            else if (newTotal < currentTotal)
+            {
+                var depositDiference = currentDeposit - newDeposit;
+                <div>
+                    <p>The new total for this booking is £@newTotal</p>
+                    <p>The new deposit for this booking is £@newDeposit</p>
+                    <p>You will be refunded £@depositDiference</p>
+                </div>
+
+            }
         }
 
         var surcharge = (double)newTotal * 0.05;
@@ -120,8 +143,18 @@
 
     async Task HandleSubmit()
     {
-        selectedBooking.DepositAmountPaid = newDeposit;
-        selectedBooking.TotalPrice = newTotal;
+
+        if (selectedBooking.paidInfull)
+        {
+            selectedBooking.DepositAmountPaid = newTotal;
+            selectedBooking.TotalPrice = newTotal;
+        }
+        else
+        {
+            selectedBooking.DepositAmountPaid = newDeposit;
+            selectedBooking.TotalPrice = newTotal;
+        }
+        
         selectedBooking.CheckOut = newCheckOut;
 
         numOfOverlap = await http.GetFromJsonAsync<int>($"/api/bookings/hotel/overlap?checkIn={selectedBooking.CheckIn}&checkOut={selectedBooking.CheckOut}&hotelId={selectedBooking.HotelId}&roomType={selectedBooking.RoomType}");
