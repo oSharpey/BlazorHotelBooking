@@ -37,19 +37,17 @@ else
 
                 var today = DateTime.Now;
                 var datediff = h.CheckIn - today;
-                if (datediff.Days > 5)
+                if (datediff.Days < 5)
                 {
-                    disableCancel = false;
+                    disableCancel = true;
                 }
 
-                if(datediff.Days > 14)
+                if(datediff.Days < 14)
                 {
-                    disableModify = false;;
+                    disableModify = true;
                 }
 
                
-
-
                 <tr>
                     <td width="5%">@h.hotelName</td>
                     <td width="5%">@h.RoomType Room</td>
