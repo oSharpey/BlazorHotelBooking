@@ -11,7 +11,7 @@ namespace BlazorHotelBooking.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-   // [Authorize(Roles = "User")]
+    [Authorize(Roles = "User")]
     public class BookingsController : ControllerBase
     {
 
