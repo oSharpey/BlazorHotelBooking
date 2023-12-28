@@ -31,20 +31,27 @@ else
         <tbody>
             @foreach (var h in hotelBookings)
             {
-                
+                disableCancel = false;
+                disableModify = false;
+             
 
                 var today = DateTime.Now;
                 var datediff = h.CheckIn - today;
-                if (datediff.Days < 5)
+                if (datediff.Days > 5)
                 {
-                    disableCancel = true;
+                    disableCancel = false;
                 }
-                if(datediff.Days < 14)
+
+                if(datediff.Days > 14)
                 {
-                    disableModify = true;
+                    disableModify = false;;
                 }
+
+               
+
+
                 <tr>
-                    <td width="5%">@h.hotelName @datediff.Days</td>
+                    <td width="5%">@h.hotelName</td>
                     <td width="5%">@h.RoomType Room</td>
                     <td width="5%">@h.CheckIn.ToString("dd/MM/yyyy")</td>
                     <td width="5%">@h.CheckOut.ToString("dd/MM/yyyy")</td>
@@ -58,7 +65,7 @@ else
                         <button class="btn btn-danger" disabled="@disableCancel" @onclick="() => CancelBooking(h.bookingId)">Cancel</button>
                     </td>
                     <td width="5%">
-                        <button class="btn btn-success" @onclick="() => ShowPayPopup(h.bookingId, h.DepositAmountPaid, h.TotalPrice)">Pay Remainder</button>
+                        <button class="btn btn-success" disabled="@h.paidInfull" @onclick="() => ShowPayPopup(h.bookingId, h.DepositAmountPaid, h.TotalPrice)">Pay Remainder</button>
                     </td>
                 </tr>
             }
@@ -132,7 +139,13 @@ else
 
     private void PayRemainder(string id)
     {
-        //code to pay remainder
+        var result = http.PutAsync($"api/bookings/hotel/payment/{id}", null);
+        NavigationManager.NavigateTo("/mybookings", true);
+    }
+
+    private void ClosePopup()
+    {
+        showPayPopup = false;
     }
 
 }
