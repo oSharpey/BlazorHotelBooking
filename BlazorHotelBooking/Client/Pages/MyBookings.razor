@@ -7,9 +7,6 @@
 @inject IJSRuntime JsRuntime
 @attribute [Authorize]
 
-<h3>MyBookings</h3>
-
-
 <h2>Hotels</h2>
 @if (hotelBookings is null)
 {
@@ -57,7 +54,7 @@ else
                     <td width="5%">£@h.DepositAmountPaid</td>
                     <td width="5%">£@h.TotalPrice</td>
                     <td width="5%">
-                        <button  class="btn btn-primary">Modify</button>
+                        <button  class="btn btn-primary" @onclick="() => ModifyBooking(h.bookingId)">Modify</button>
                     </td>
                     <td width="5%">
                         <button class="btn btn-danger" disabled="@disableCancel" @onclick="() => CancelBooking(h.bookingId)">Cancel</button>
@@ -99,6 +96,11 @@ else
     {
         var result = await http.DeleteAsync($"api/bookings/hotel/{id}");
         NavigationManager.NavigateTo("/mybookings", true);
+    }
+
+    private void ModifyBooking(string id)
+    {
+        NavigationManager.NavigateTo($"/editbooking/{id}");
     }
 
 }

@@ -24,7 +24,7 @@ namespace BlazorHotelBooking.Server.Controllers
         }
 
         [HttpGet("hotel/userbooking")]
-        public async Task<ActionResult<List<HotelBookingViewModel>>> GetAllBookingsWithId(string userId)
+        public async Task<ActionResult<List<HotelBookingViewModel>>> GetAllBookingsWithUserId(string userId)
         {
             var query = from hotel in _context.Hotels
                         join booking in _context.HotelBookings on hotel.Id equals booking.HotelId
@@ -44,6 +44,20 @@ namespace BlazorHotelBooking.Server.Controllers
 
             return Ok(result);
         }
+
+        [HttpGet("hotel/{id}")]
+        public async Task<ActionResult<HotelBooking>> GetHotelBookingById(string id)
+        {
+            var dbhotel = await _context.HotelBookings.FindAsync(id);
+
+            if (dbhotel == null)
+            {
+                return NotFound("This hotel does not exist");
+            }
+
+            return Ok(dbhotel);
+        }
+
 
 
         //check if bookings overlap
