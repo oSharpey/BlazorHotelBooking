@@ -23,15 +23,25 @@ namespace BlazorHotelBooking.Server.Services
 
             while (await timer.WaitForNextTickAsync(stoppingToken))
             {
-                var bookings = _context.HotelBookings.Where(x => x.PaidInfull == false && x.IsCancelled == false && x.PaymentDueDate < DateTime.Now).ToList();
+                var hotelbookings = _context.HotelBookings.Where(x => x.PaidInfull == false && x.IsCancelled == false && x.PaymentDueDate < DateTime.Now).ToList();
+                var tourbookings = _context.TourBookings.Where(x => x.PaidInfull == false && x.IsCancelled == false && x.PaymentDueDate < DateTime.Now).ToList();
 
-                foreach (var booking in bookings)
+                foreach (var booking in hotelbookings)
                 {
                     Console.WriteLine($"{booking.Id} has been cancelled");
                     booking.IsCancelled = true;
                     _context.HotelBookings.Update(booking);
-                    await _context.SaveChangesAsync();
+                   
                 }
+
+                foreach (var booking in tourbookings)
+                {
+                    Console.WriteLine($"{booking.Id} has been cancelled");
+                    booking.IsCancelled = true;
+                    _context.TourBookings.Update(booking);
+                }
+
+                await _context.SaveChangesAsync();
             }
         }
     }
