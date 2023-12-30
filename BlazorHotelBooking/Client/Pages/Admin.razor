@@ -45,9 +45,50 @@ else
     </table>
 }
 
+<br/>
+<button @onclick="AddTour" class="btn btn-primary">Add Hotel</button>
+<br />
+@if (tours is null)
+{
+<span>Loading Tours…</span>
+}
+else
+{
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Duration</th>
+            <th>Max Num Of Guests</th>
+        </tr>
+
+    </thead>
+    <tbody>
+        @foreach (var t in tours)
+        {
+            <tr>
+                <td width="5%">@t.Id</td>
+                <td width="5%">@t.Name</td>
+                <td width="5%">@t.Cost</td>
+                <td width="5%">@t.DurationInDays</td>
+                <td width="5%">@t.MaxNumberOfGuests</td>
+                <td width="5%">
+                    <button @onclick="(() => EditTour(t.Id))" class="btn btn-primary">Edit</button>
+                </td>
+            </tr>
+
+        }
+    </tbody>
+</table>
+}
+
+
 
 @code {
     List<Hotel>? hotels;
+    List<Tour>? tours;
 
     protected override async Task OnInitializedAsync()
     {
@@ -56,6 +97,14 @@ else
         {
             hotels = result;
         }
+
+        var result2 = await http.GetFromJsonAsync<List<Tour>>("/api/tour");
+        if (result2 != null)
+        {
+            tours = result2;
+        }   
+
+
     }
 
     private void AddHotel()
@@ -64,6 +113,16 @@ else
     }
 
     private void EditHotel(int id)
+    {
+        NavigationManager.NavigateTo($"/hoteledit/{id}");
+    }
+
+    private void AddTour()
+    {
+        NavigationManager.NavigateTo("/hoteledit");
+    }
+
+    private void EditTour(int id)
     {
         NavigationManager.NavigateTo($"/hoteledit/{id}");
     }
