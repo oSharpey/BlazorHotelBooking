@@ -127,7 +127,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        min = DateOnly.FromDateTime(DateTime.Now.Date.AddDays(1)).ToString("yyyy-MM-dd");
+        min = DateOnly.FromDateTime(DateTime.Now.Date.AddMonths(2)).ToString("yyyy-MM-dd");
         max = DateOnly.FromDateTime(DateTime.Now.Date.AddYears(5)).ToString("yyyy-MM-dd");
 
         var authState = await authenticationState;
@@ -162,6 +162,7 @@
         {
             newBooking.HotelId = selectedHotel.Id;
             newBooking.UserId = userId;
+            newBooking.PaymentDueDate = newBooking.CheckIn.AddDays(-28);
 
             await http.PostAsJsonAsync("/api/bookings/hotel/book", newBooking);
 

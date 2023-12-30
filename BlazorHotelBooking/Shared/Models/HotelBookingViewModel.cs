@@ -20,7 +20,10 @@ namespace BlazorHotelBooking.Shared.Models
         public decimal TotalPrice { get; set; }
         public decimal DepositAmountPaid { get; set; }
         public DateTime BookingDate { get; set; } 
-        public bool paidInfull { get; set; } = false;
+        public bool paidInfull { get; set; }
+        public bool IsCancelled { get; set; }
+
+
         
 
     }
