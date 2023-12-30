@@ -15,6 +15,8 @@
 }
 else
 {
+    <h5>Hotels</h5>
+
     <table class="table">
         <thead>
             <tr>
@@ -45,17 +47,67 @@ else
     </table>
 }
 
+<br/>
+<button @onclick="AddTour" class="btn btn-primary">Add Tour</button>
+<br />
+@if (tours is null)
+{
+    <span>Loading Tours…</span>
+}
+else
+{
+    <h5>Tours</h5>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Duration</th>
+                <th>Max Num Of Guests</th>
+            </tr>
+
+        </thead>
+        <tbody>
+            @foreach (var t in tours)
+            {
+                <tr>
+                    <td width="5%">@t.Id</td>
+                    <td width="5%">@t.Name</td>
+                    <td width="5%">@t.Cost</td>
+                    <td width="5%">@t.DurationInDays</td>
+                    <td width="5%">@t.MaxNumberOfGuests</td>
+                    <td width="5%">
+                        <button @onclick="(() => EditTour(t.Id))" class="btn btn-primary">Edit</button>
+                    </td>
+                </tr>
+
+            }
+        </tbody>
+    </table>
+}
+
+
 
 @code {
     List<Hotel>? hotels;
+    List<Tour>? tours;
 
     protected override async Task OnInitializedAsync()
     {
-        var result = await http.GetFromJsonAsync<List<Hotel>>("/api/Admin/hotel");
+        var result = await http.GetFromJsonAsync<List<Hotel>>("/api/hotel");
         if (result != null)
         {
             hotels = result;
         }
+
+        var result2 = await http.GetFromJsonAsync<List<Tour>>("/api/tour");
+        if (result2 != null)
+        {
+            tours = result2;
+        }   
+
+
     }
 
     private void AddHotel()
@@ -66,5 +118,15 @@ else
     private void EditHotel(int id)
     {
         NavigationManager.NavigateTo($"/hoteledit/{id}");
+    }
+
+    private void AddTour()
+    {
+        NavigationManager.NavigateTo("/touredit");
+    }
+
+    private void EditTour(int id)
+    {
+        NavigationManager.NavigateTo($"/touredit/{id}");
     }
 }

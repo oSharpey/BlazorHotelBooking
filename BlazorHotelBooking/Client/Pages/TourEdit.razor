@@ -1,0 +1,90 @@
+﻿@page "/touredit"
+@page "/touredit/{id:int}"
+@using BlazorHotelBooking.Shared
+@using Microsoft.AspNetCore.Authorization
+@inject HttpClient http
+@inject NavigationManager NavigationManager
+@attribute [Authorize(Roles="Admin")]
+
+@if (Id is null)
+{
+    <PageTitle>Add New Tour</PageTitle>
+    <h3>Add New Tour</h3>
+}
+else
+{
+    <PageTitle> Edit @selectedTour.Name </PageTitle>
+    <h3>@selectedTour.Name</h3>
+}
+
+<EditForm Model="selectedTour" OnSubmit="HandleSubmit">
+
+    <div>
+        <label for="Id">Id</label>
+        <InputNumber id="Id" @bind-Value="selectedTour.Id" class="form-control" disabled="true" />
+    </div>
+    <div>
+        <label for="Name">Name</label>
+        <InputText id="Name" @bind-Value="selectedTour.Name" class="form-control" />
+    </div>
+    <div>
+        <label for="Cost">Cost</label>
+        <InputNumber id="Cost" @bind-Value="selectedTour.Cost" class="form-control" />
+    </div>
+    <div>
+        <label for="Duration">Duration</label>
+        <InputNumber id="Duration" @bind-Value="selectedTour.DurationInDays" class="form-control" />
+    </div>
+    <div>
+        <label for="MaxGuests">Max Number of Guests</label>
+        <InputNumber id="MaxGuests" @bind-Value="selectedTour.MaxNumberOfGuests" class="form-control" />
+    </div>
+    <div>
+        <label for="Description">Description</label>
+        <InputText id="Description" @bind-Value="selectedTour.Description" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Save</button>
+    @if(Id is not null)
+    {
+        <button type="button" class="btn btn-danger" @onclick="DeleteTour">Delete</button>
+    }
+</EditForm>
+
+
+@code {
+    [Parameter]
+    public int? Id { get; set; }
+
+    private Tour selectedTour = new Tour { Name = "New Tour" };
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id is not null)
+        {
+            var result = await http.GetFromJsonAsync<Tour>($"api/tour/{Id}");
+            if (result is not null)
+            {
+                selectedTour = result;
+            }
+        }
+    }
+
+    async Task DeleteTour()
+    {
+        await http.DeleteAsync($"api/Admin/tour/{Id}");
+        NavigationManager.NavigateTo("/admin");
+    }
+
+    async Task HandleSubmit()
+    {
+        if(Id is null)
+        {
+            await http.PostAsJsonAsync("/api/Admin/tour", selectedTour);
+        }
+        else
+        {
+            await http.PutAsJsonAsync($"api/Admin/tour/{Id}", selectedTour);
+        }
+        NavigationManager.NavigateTo("/admin");
+    }
+}
