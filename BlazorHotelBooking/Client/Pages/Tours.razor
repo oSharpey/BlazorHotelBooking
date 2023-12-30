@@ -11,7 +11,7 @@
 
 @if (tours.Count <= 0)
 {
-    <span> Loading Hotels...</span>
+    <span> Loading tours...</span>
 }
 else
 {
@@ -19,7 +19,7 @@ else
     {
         <li class="media my-3">
             <div class="media-body">
-                <a href="/hotels/@tour.Id">
+                <a href="/tours/@tour.Id">
                     <h4 class="mb-0">@tour.Name</h4>
                 </a>
                 <p>@tour.Description</p>

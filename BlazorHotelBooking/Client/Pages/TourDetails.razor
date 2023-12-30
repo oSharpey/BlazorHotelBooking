@@ -1,4 +1,4 @@
-﻿@page "/hotels/{id}"
+﻿@page "/tours/{id}"
 @using BlazorHotelBooking.Shared;
 @using Microsoft.AspNetCore.Authorization;
 @using Microsoft.AspNetCore.Http;
@@ -13,26 +13,21 @@
 
 <div class="media">
     <div class="media-body">
-        <h2 class="mb-0">@selectedHotel.Name</h2>
-        <p>@selectedHotel.Description</p>
+        <h2 class="mb-0">@selectedTour.Name</h2>
+        <p>@selectedTour.Description</p>
+        <p>Max Number of Guests: @selectedTour.MaxNumberOfGuests</p>
         <h4 class="price">
-            Single Room: £@selectedHotel.SBPrice (per night)
+            @selectedTour.Cost
         </h4>
-        <h4 class="price">
-            Double Room: £@selectedHotel.DBPrice (per night)
-        </h4>
-        <h4 class="price">
-            Family Room: £@selectedHotel.FamPrice (per night)
-        </h4>
-        <button @onclick="ShowBookingForm" class="btn btn-primary"><i class="oi oi-cart">&nbsp;&nbsp;&nbsp; Book Hotel</i></button>
+        <button @onclick="ShowBookingForm" class="btn btn-primary"><i class="oi oi-cart">&nbsp;&nbsp;&nbsp; Book Tour</i></button>
     </div>
 </div>
 
-@if(showBookingForm)
+@* @if(showBookingForm)
 {
     <div class="backgroundPopupBox">
         <div class="popupCreate">
-            <EditForm Model=@newBooking OnValidSubmit=BookHotel>
+            <EditForm Model=@newBooking OnValidSubmit=BookTour>
                 <DataAnnotationsValidator />
                 <ValidationSummary />
                
@@ -92,7 +87,7 @@
                     </div>
                 }
 
-                <button type="button" class="btn btn-success" @onclick="BookHotel">Book</button>
+                <button type="button" class="btn btn-success" @onclick="BookTour">Book</button>
 
             </EditForm>
 
@@ -102,12 +97,12 @@
         </div>
     </div>
 
-}
+} *@
 
 
 @code {
-    private Hotel selectedHotel = new Hotel();
-    private HotelBooking newBooking = new HotelBooking();
+    private Tour selectedTour = new Tour();
+    //private HotelBooking newBooking = new HotelBooking();
     private bool showBookingForm = false;
     private string min;
     private string max;
@@ -121,7 +116,7 @@
     [Parameter]
     public string? Id { get; set; }
 
-    List<Hotel> hotels = new List<Hotel>();
+    List<Tour> tours = new List<Tour>();
     List<string> roomType = new List<string>() { "Single", "Double", "Family" };
 
     protected override async Task OnInitializedAsync()
@@ -133,13 +128,13 @@
         var user = authState?.User;
         userId = user?.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
-        var result = await http.GetFromJsonAsync<List<Hotel>>("/api/hotel");
+        var result = await http.GetFromJsonAsync<List<Tour>>("/api/tour");
         if (result != null)
         {
-            hotels = result;
+            tours = result;
         }
 
-        selectedHotel = hotels.FirstOrDefault(h => h.Id == Int32.Parse(Id));
+        selectedTour = tours.FirstOrDefault(h => h.Id == Int32.Parse(Id));
     }
 
     private void ShowBookingForm()
@@ -147,27 +142,29 @@
         showBookingForm = true;
     }
 
-    async Task BookHotel()
+    async Task BookTour()
     {
 
+        // Need to change for tours 
+
         //code to check if the newbooking overlaps with existing bookings
-        numOfOverlap = await http.GetFromJsonAsync<int>($"/api/bookings/hotel/overlap?checkIn={newBooking.CheckIn}&checkOut={newBooking.CheckOut}&hotelId={selectedHotel.Id}&roomType={newBooking.RoomType}");
+        // numOfOverlap = await http.GetFromJsonAsync<int>($"/api/bookings/hotel/overlap?checkIn={newBooking.CheckIn}&checkOut={newBooking.CheckOut}&hotelId={selectedHotel.Id}&roomType={newBooking.RoomType}");
 
-        if (numOfOverlap > 20)
-        {
-            showOverlap = true;
-        } 
-        else 
-        {
-            newBooking.HotelId = selectedHotel.Id;
-            newBooking.UserId = userId;
-            newBooking.PaymentDueDate = newBooking.CheckIn.AddDays(-28);
+        // if (numOfOverlap > 20)
+        // {
+        //     showOverlap = true;
+        // } 
+        // else 
+        // {
+        //     newBooking.HotelId = selectedHotel.Id;
+        //     newBooking.UserId = userId;
+        //     newBooking.PaymentDueDate = newBooking.CheckIn.AddDays(-28);
 
-            await http.PostAsJsonAsync("/api/bookings/hotel/book", newBooking);
+        //     await http.PostAsJsonAsync("/api/bookings/hotel/book", newBooking);
 
-            ClosePopup();
-            NavigationManager.NavigateTo("/mybookings");
-        }
+        //     ClosePopup();
+        //     NavigationManager.NavigateTo("/mybookings");
+        // }
 
         
        
