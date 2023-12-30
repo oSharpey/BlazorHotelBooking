@@ -39,7 +39,8 @@ namespace BlazorHotelBooking.Server.Controllers
                             TotalPrice = booking.TotalPrice,
                             DepositAmountPaid = booking.DepositAmountPaid,
                             BookingDate = booking.BookingDate,
-                            paidInfull = booking.paidInfull
+                            paidInfull = booking.PaidInfull,
+                            IsCancelled = booking.IsCancelled
                         };
             var result = await query.ToListAsync();
 
@@ -56,13 +57,13 @@ namespace BlazorHotelBooking.Server.Controllers
                 return NotFound("This hotel does not exist");
             }
 
-            if (dbHotel.paidInfull == true)
+            if (dbHotel.PaidInfull == true)
             {
                 return BadRequest("You have already paid in full");
             }
 
             dbHotel.DepositAmountPaid = dbHotel.TotalPrice;
-            dbHotel.paidInfull = true;
+            dbHotel.PaidInfull = true;
 
             _context.HotelBookings.Update(dbHotel);
             await _context.SaveChangesAsync();

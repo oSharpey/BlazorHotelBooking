@@ -1,5 +1,6 @@
 using BlazorHotelBooking.Server.Data;
 using BlazorHotelBooking.Server.Models;
+using BlazorHotelBooking.Server.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -12,6 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddHostedService<CheckLatePayementService>();
 builder.Services.AddRazorPages();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<DataContext>(options =>

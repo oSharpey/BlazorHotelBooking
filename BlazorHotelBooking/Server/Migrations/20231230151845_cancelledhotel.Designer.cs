@@ -4,6 +4,7 @@ using BlazorHotelBooking.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorHotelBooking.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20231230151845_cancelledhotel")]
+    partial class cancelledhotel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -205,9 +208,6 @@ namespace BlazorHotelBooking.Server.Migrations
                     b.Property<bool>("PaidInfull")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("PaymentDueDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("RoomType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -254,14 +254,14 @@ namespace BlazorHotelBooking.Server.Migrations
                         new
                         {
                             Id = "1",
-                            ConcurrencyStamp = "00efb88a-129b-4cbd-92b4-3523b060a745",
+                            ConcurrencyStamp = "f5ea8602-462f-42fa-8b29-a1c9402a1a78",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = "2",
-                            ConcurrencyStamp = "e107e00d-73f9-445c-b74b-b04f3718f015",
+                            ConcurrencyStamp = "1a438254-7794-4de2-950f-5ed9d79393f7",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });

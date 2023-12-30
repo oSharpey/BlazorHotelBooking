@@ -54,7 +54,7 @@
         }
 
 
-        if(selectedBooking.paidInfull)
+        if(selectedBooking.PaidInfull)
         {
             if (newTotal > currentTotal)
             {
@@ -144,7 +144,7 @@
     async Task HandleSubmit()
     {
 
-        if (selectedBooking.paidInfull)
+        if (selectedBooking.PaidInfull)
         {
             selectedBooking.DepositAmountPaid = newTotal;
             selectedBooking.TotalPrice = newTotal;
