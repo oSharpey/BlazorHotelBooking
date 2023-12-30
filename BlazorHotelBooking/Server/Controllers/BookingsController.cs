@@ -43,7 +43,8 @@ namespace BlazorHotelBooking.Server.Controllers
                             DepositAmountPaid = booking.DepositAmountPaid,
                             BookingDate = booking.BookingDate,
                             paidInfull = booking.PaidInfull,
-                            IsCancelled = booking.IsCancelled
+                            IsCancelled = booking.IsCancelled,
+                            PaymentDueDate = booking.PaymentDueDate
                         };
             var result = await query.ToListAsync();
 
@@ -186,7 +187,8 @@ namespace BlazorHotelBooking.Server.Controllers
                             DepositAmountPaid = booking.DepositAmountPaid,
                             BookingDate = booking.BookingDate,
                             paidInfull = booking.PaidInfull,
-                            IsCancelled = booking.IsCancelled
+                            IsCancelled = booking.IsCancelled,
+                            PaymentDueDate = booking.PaymentDueDate
                         };
             var result = await query.ToListAsync();
 

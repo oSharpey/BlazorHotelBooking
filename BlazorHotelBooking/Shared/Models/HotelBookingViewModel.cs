@@ -22,6 +22,7 @@ namespace BlazorHotelBooking.Shared.Models
         public DateTime BookingDate { get; set; } 
         public bool paidInfull { get; set; }
         public bool IsCancelled { get; set; }
+        public DateTime PaymentDueDate { get; set; }
 
 
         
