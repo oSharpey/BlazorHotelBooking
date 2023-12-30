@@ -11,7 +11,7 @@ namespace BlazorHotelBooking.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize(Roles = "User")]
+    [Authorize(Roles = "User")]
 
     public class TourController : ControllerBase
     {
@@ -37,7 +37,7 @@ namespace BlazorHotelBooking.Server.Controllers
 
             if (dbtour == null)
             {
-                return NotFound("This hotel does not exist");
+                return NotFound("This tour does not exist");
             }
 
             return Ok(dbtour);

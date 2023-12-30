@@ -21,6 +21,8 @@ namespace BlazorHotelBooking.Server.Controllers
             _context = context;
         }
 
+
+        // Admin for Hotels
         
         [HttpGet("hotel")]
         public async Task<ActionResult<List<Hotel>>> GetAllHotels()
@@ -93,6 +95,81 @@ namespace BlazorHotelBooking.Server.Controllers
             await _context.SaveChangesAsync();
 
             return await GetAllHotels();
+        }
+
+
+
+        //Admin For tours
+        [HttpGet("tour")]
+        public async Task<ActionResult<List<Tour>>> GetAllTours()
+        {
+            var list = await _context.Tours.ToListAsync();
+
+            return Ok(list);
+        }
+
+        [HttpGet("tour/{id}")]
+        public async Task<ActionResult<Tour>> GetTour(int id)
+        {
+            var dbtour = await _context.Tours.FindAsync(id);
+
+            if (dbtour == null)
+            {
+                return NotFound("This tour does not exist");
+            }
+
+            return Ok(dbtour);
+        }
+
+
+        [HttpPost("tour")]
+        public async Task<ActionResult<List<Tour>>> AddTour(Tour tour)
+        {
+            _context.Tours.Add(tour);
+            await _context.SaveChangesAsync();
+
+            return await GetAllTours();
+        }
+
+
+        [HttpPut("tour/{id}")]
+        public async Task<ActionResult<List<Tour>>> UpdateTour(int id, Tour tour)
+        {
+            var dbtour = await _context.Tours.FindAsync(id);
+
+            if (dbtour == null)
+            {
+                return NotFound("This tour does not exist");
+            }
+
+            dbtour.Id = tour.Id;
+            dbtour.Name = tour.Name;
+            dbtour.Cost = tour.Cost;
+            dbtour.MaxNumberOfGuests = tour.MaxNumberOfGuests;
+            dbtour.DurationInDays = tour.DurationInDays;
+            dbtour.Description = tour.Description;
+
+            _context.Tours.Update(dbtour);
+            await _context.SaveChangesAsync();
+
+            return await GetAllTours();
+        }
+
+
+        [HttpDelete("tour/{id}")]
+        public async Task<ActionResult<List<Tour>>> DeleteTour(int id)
+        {
+            var dbtour = await _context.Tours.FindAsync(id);
+
+            if (dbtour == null)
+            {
+                return NotFound("This tour does not exist");
+            }
+
+            _context.Tours.Remove(dbtour);
+            await _context.SaveChangesAsync();
+
+            return await GetAllTours();
         }
     }
 }

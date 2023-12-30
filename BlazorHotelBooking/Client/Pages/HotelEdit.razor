@@ -61,7 +61,7 @@ else
     {
         if (Id is not null)
         {
-            var result = await http.GetFromJsonAsync<Hotel>($"api/Admin/hotel/{Id}");
+            var result = await http.GetFromJsonAsync<Hotel>($"api/hotel/{Id}");
             if (result is not null)
             {
                 selectedHotel = result;

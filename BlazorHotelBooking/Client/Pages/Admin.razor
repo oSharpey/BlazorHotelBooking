@@ -51,7 +51,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var result = await http.GetFromJsonAsync<List<Hotel>>("/api/Admin/hotel");
+        var result = await http.GetFromJsonAsync<List<Hotel>>("/api/hotel");
         if (result != null)
         {
             hotels = result;
