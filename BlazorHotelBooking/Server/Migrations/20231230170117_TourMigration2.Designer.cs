@@ -4,6 +4,7 @@ using BlazorHotelBooking.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorHotelBooking.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20231230170117_TourMigration2")]
+    partial class TourMigration2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -241,9 +244,6 @@ namespace BlazorHotelBooking.Server.Migrations
                     b.Property<int>("DurationInDays")
                         .HasColumnType("int");
 
-                    b.Property<int>("MaxNumberOfGuests")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -259,7 +259,6 @@ namespace BlazorHotelBooking.Server.Migrations
                             Cost = 1200m,
                             Description = "Dive into charming villages, rolling hills, and iconic castles in this 6-day escape to authentic Britain",
                             DurationInDays = 6,
-                            MaxNumberOfGuests = 30,
                             Name = "Real Britain"
                         },
                         new
@@ -268,7 +267,6 @@ namespace BlazorHotelBooking.Server.Migrations
                             Cost = 2000m,
                             Description = "Journey through 16 days of cityscapes, dramatic coasts, and Celtic charm. Uncover the best of Britain and Ireland.",
                             DurationInDays = 16,
-                            MaxNumberOfGuests = 40,
                             Name = "Britain and Ireland Explorer"
                         },
                         new
@@ -277,7 +275,6 @@ namespace BlazorHotelBooking.Server.Migrations
                             Cost = 2900m,
                             Description = "Indulge in 12 days of luxury. Explore stately homes, savor Michelin stars, and discover hidden gems of Britain's finest",
                             DurationInDays = 12,
-                            MaxNumberOfGuests = 30,
                             Name = "Best of Britain"
                         });
                 });
@@ -312,14 +309,14 @@ namespace BlazorHotelBooking.Server.Migrations
                         new
                         {
                             Id = "1",
-                            ConcurrencyStamp = "42c401d0-37e1-4d70-8ecf-99719c100278",
+                            ConcurrencyStamp = "58ea16a6-58ac-47b5-bf2d-792b9cb3d25a",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = "2",
-                            ConcurrencyStamp = "0a89c572-f535-4c14-b293-7a3c77d47dd3",
+                            ConcurrencyStamp = "54a778f1-64bd-4963-b89e-cc5d970576dc",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
