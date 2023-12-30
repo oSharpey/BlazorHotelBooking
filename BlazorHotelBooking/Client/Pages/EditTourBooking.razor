@@ -1,0 +1,89 @@
+﻿@page "/editbooking/tour/{id}"
+@using BlazorHotelBooking.Shared
+@using Microsoft.AspNetCore.Authorization
+@inject HttpClient http
+@inject NavigationManager NavigationManager
+@attribute [Authorize]
+
+
+<PageTitle> Edit Booking </PageTitle>
+<h4>Editing booking for @tour.Name on @selectedBooking.CommencementDate.ToString("dd/MM/yyyy")</h4>
+
+
+<EditForm Model="selectedBooking" OnSubmit="HandleSubmit">
+    <div>
+        <label for="TourName">Tour</label>
+        <InputText id="TourName" @bind-Value="tour.Name" class="form-control" disabled="true" />
+    </div>
+    <div>
+        <label for="NumOfPeople">Number Of Guests</label>
+        <InputNumber id="NumOfPeople" @bind-Value="selectedBooking.NumberOfPeople" class="form-control" />
+    </div>
+   
+    @{
+        var currentDeposit = selectedBooking.DepositAmountPaid;
+        var surcharge = (double)currentDeposit * 0.05;
+    
+        <p>Modifying this booking will also incure a 5% surcharge (£@surcharge)</p>
+
+        if (showOverlap)
+        {
+            <div class="alert alert-danger" role="alert">
+                <p>There are no more spaces for this tour for that many people.</p>
+            </div>
+        }
+    }
+    <button type="submit" class="btn btn-primary">Save</button>
+</EditForm> 
+
+
+@code {
+    [Parameter]
+    public string? Id { get; set; }
+    private TourBooking selectedBooking = new TourBooking();
+    private Tour tour = new Tour();
+    private int currentNights;
+    private decimal newTotal, newDeposit;
+    private DateTime newCheckOut;
+    private bool showOverlap = false;
+    private int numOfOverlap;
+    private int currentPeople;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id is not null)
+        {
+            var result = await http.GetFromJsonAsync<TourBooking>($"api/bookings/tour/{Id}");
+            if (result is not null)
+            {
+                selectedBooking = result;
+            }
+        }
+
+        currentPeople = selectedBooking.NumberOfPeople;
+
+        tour = await http.GetFromJsonAsync<Tour>($"api/tour/{selectedBooking.TourId}");
+    }
+
+    async Task HandleSubmit()
+    {
+
+        numOfOverlap = await http.GetFromJsonAsync<int>($"/api/bookings/tour/overlap?start={selectedBooking.CommencementDate}&end={selectedBooking.EndDate}&tourId={tour.Id}");
+
+        if (tour.MaxNumberOfGuests < numOfOverlap + (selectedBooking.NumberOfPeople - currentPeople))
+        {
+            showOverlap = true;
+        }
+        else
+        {
+            await http.PutAsJsonAsync($"api/bookings/tour/{Id}", selectedBooking);
+            NavigationManager.NavigateTo("/mybookings");
+        }
+    }
+
+
+
+       
+
+    
+}

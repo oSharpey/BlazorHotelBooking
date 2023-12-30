@@ -7,7 +7,7 @@
 @inject IJSRuntime JsRuntime
 @attribute [Authorize]
 
-<h2>Hotels</h2>
+
 @if (hotelBookings is null)
 {
     <h3>Loading Hotels…</h3>
@@ -15,110 +15,251 @@
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Hotel</th>
-                <th>Room Type</th>
-                <th>Check In Date</th>
-                <th>Check Out Date</th>
-                <th>Number of Nights</th>
-                <th>Amount Paid so Far</th>
-                <th>Total Cost</th>
-                <th>Payment Due Date</th>
-            </tr>
+    
+    if(hotelBookings.Count == 0)
+    {
+        <h3>You have no hotel bookings</h3>
+    }
+    else
+    {
+        <h2>Hotels</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Hotel</th>
+                    <th>Room Type</th>
+                    <th>Check In Date</th>
+                    <th>Check Out Date</th>
+                    <th>Number of Nights</th>
+                    <th>Amount Paid so Far</th>
+                    <th>Total Cost</th>
+                    <th>Payment Due Date</th>
+                </tr>
 
-        </thead>
-        <tbody>
-            @foreach (var h in hotelBookings)
-            {
-
-                if(!h.IsCancelled)
+            </thead>
+            <tbody>
+                @foreach (var h in hotelBookings)
                 {
-                    disableCancel = false;
-                    disableModify = false;
-             
 
-                    var today = DateTime.Now;
-                    var datediff = h.CheckIn - today;
-                    if (datediff.Days < 5)
+                    if (!h.IsCancelled)
                     {
-                        disableCancel = true;
-                    }
+                        disableCancel = false;
+                        disableModify = false;
 
-                    if(datediff.Days < 14)
+
+                        var today = DateTime.Now;
+                        var datediff = h.CheckIn - today;
+                        if (datediff.Days < 5)
+                        {
+                            disableCancel = true;
+                        }
+
+                        if (datediff.Days < 14)
+                        {
+                            disableModify = true;
+                        }
+
+
+                        <tr>
+                            <td width="5%">@h.hotelName</td>
+                            <td width="5%">@h.RoomType Room</td>
+                            <td width="5%">@h.CheckIn.ToString("dd/MM/yyyy")</td>
+                            <td width="5%">@h.CheckOut.ToString("dd/MM/yyyy")</td>
+                            <td width="5%">@h.NumberOfNights Nights</td>
+                            <td width="5%">£@h.DepositAmountPaid</td>
+                            <td width="5%">£@h.TotalPrice</td>
+                            <td width="5%">@h.PaymentDueDate</td>
+                            <td width="5%">
+                                <button class="btn btn-primary" disabled="@disableModify" @onclick="() => ModifyHotelBooking(h.bookingId)">Modify</button>
+                            </td>
+                            <td width="5%">
+                                <button class="btn btn-danger" disabled="@disableCancel" @onclick="() => CancelHotelBooking(h.bookingId)">Cancel</button>
+                            </td>
+                            <td width="5%">
+                                <button class="btn btn-success" disabled="@h.paidInfull" @onclick="() => ShowHotelPayPopup(h.bookingId, h.DepositAmountPaid, h.TotalPrice)">Pay Remainder</button>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+
+
+        if (hasCancelledBookingsHotel)
+        {
+            <h3>Cancelled Hotels for late payment</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Hotel</th>
+                        <th>Room Type</th>
+                        <th>Check In Date</th>
+                        <th>Check Out Date</th>
+                    </tr>
+
+                </thead>
+                <tbody>
+                    @foreach (var h in hotelBookings)
                     {
-                        disableModify = true;
+
+                        if (h.IsCancelled)
+                        {
+                            <tr>
+                                <td width="5%">@h.hotelName</td>
+                                <td width="5%">@h.RoomType Room</td>
+                                <td width="5%">@h.CheckIn.ToString("dd/MM/yyyy")</td>
+                                <td width="5%">@h.CheckOut.ToString("dd/MM/yyyy")</td>
+                            </tr>
+                        }
                     }
+                </tbody>
+            </table>
 
-               
-                    <tr>
-                        <td width="5%">@h.hotelName</td>
-                        <td width="5%">@h.RoomType Room</td>
-                        <td width="5%">@h.CheckIn.ToString("dd/MM/yyyy")</td>
-                        <td width="5%">@h.CheckOut.ToString("dd/MM/yyyy")</td>
-                        <td width="5%">@h.NumberOfNights Nights</td>
-                        <td width="5%">£@h.DepositAmountPaid</td>
-                        <td width="5%">£@h.TotalPrice</td>
-                        <td width="5%">@h.CheckIn.AddDays(-28).ToString("dd/MM/yyyy")</td>
-                        <td width="5%">
-                            <button class="btn btn-primary" disabled="@disableModify" @onclick="() => ModifyBooking(h.bookingId)">Modify</button>
-                        </td>
-                        <td width="5%">
-                            <button class="btn btn-danger" disabled="@disableCancel" @onclick="() => CancelBooking(h.bookingId)">Cancel</button>
-                        </td>
-                        <td width="5%">
-                            <button class="btn btn-success" disabled="@h.paidInfull" @onclick="() => ShowPayPopup(h.bookingId, h.DepositAmountPaid, h.TotalPrice)">Pay Remainder</button>
-                        </td>
-                    </tr>
-                }
-            }
-        </tbody>
-    </table>
-
-
-    <h3>Cancelled Hotels for late payment</h3>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Hotel</th>
-                <th>Room Type</th>
-                <th>Check In Date</th>
-                <th>Check Out Date</th>
-            </tr>
-
-        </thead>
-        <tbody>
-            @foreach (var h in hotelBookings)
-            {
-
-                if (h.IsCancelled)
-                {
-                    <tr>
-                        <td width="5%">@h.hotelName</td>
-                        <td width="5%">@h.RoomType Room</td>
-                        <td width="5%">@h.CheckIn.ToString("dd/MM/yyyy")</td>
-                        <td width="5%">@h.CheckOut.ToString("dd/MM/yyyy")</td>
-                    </tr>
-                }
-            }
-        </tbody>
-    </table>
+            <br />
+            <br />
+        }
+    }
 }
 
 @{
-    if (showPayPopup)
+    if (showHotelPayPopup)
     {
         var remainder = totalToPay - currentlyPaid;
 
         <div class="backgroundPopupBox">
             <div class="popupCreate">
-            <h3>Pay Remainder</h3>
-                <p>Are you sure you want to pay the remainder of this booking? It will cost you £@remainder </p>
-                <button class="btn btn-success" @onclick="() => PayRemainder(bookingId)">Yes</button>
+                <h3>Pay Remainder</h3>
+                <p>Are you sure you want to pay the remainder of this hotel booking? It will cost you £@remainder </p>
+                <button class="btn btn-success" @onclick="() => PayHotelRemainder(bookingId)">Yes</button>
                 <button class="btn btn-danger" @onclick="ClosePopup">No</button>
             </div>
-        </div>   
+        </div>
+    }
+}
+
+
+@if (tourBookings is null)
+{
+    <h3>Loading Tours…</h3>
+}
+else
+{
+    if (tourBookings.Count == 0)
+    {
+        <h3>You have no tour bookings</h3>
+    }
+    else
+    {
+        <h2>Tours</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Tour</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Number of Guests</th>
+                    <th>Amount Paid so Far</th>
+                    <th>Total Cost</th>
+                    <th>Payment Due Date</th>
+                </tr>
+
+            </thead>
+            <tbody>
+                @foreach (var t in tourBookings)
+                {
+
+                    if (!t.IsCancelled)
+                    {
+                        disableCancel = false;
+                        disableModify = false;
+
+
+                        var today = DateTime.Now;
+                        var datediff = t.CommencementDate - today;
+                        if (datediff.Days < 5)
+                        {
+                            disableCancel = true;
+                        }
+
+                        if (datediff.Days < 14)
+                        {
+                            disableModify = true;
+                        }
+
+
+                        <tr>
+                            <td width="5%">@t.TourName</td>
+                            <td width="5%">@t.CommencementDate.ToString("dd/MM/yyy")</td>
+                            <td width="5%">@t.EndDate.ToString("dd/MM/yyyy")</td>
+                            <td width="5%">@t.NumberOfGuests people</td>
+                            <td width="5%">£@t.DepositAmountPaid</td>
+                            <td width="5%">£@t.TotalPrice</td>
+                            <td width="5%">@t.PaymentDueDate.ToString("dd/MM/yyyy")</td>
+                            <td width="5%">
+                                <button class="btn btn-primary" disabled="@disableModify" @onclick="() => ModifyTourBooking(t.bookingId)">Modify</button>
+                            </td>
+                            <td width="5%">
+                                <button class="btn btn-danger" disabled="@disableCancel" @onclick="() => CancelTourBooking(t.bookingId)">Cancel</button>
+                            </td>
+                            <td width="5%">
+                                <button class="btn btn-success" disabled="@t.paidInfull" @onclick="() => ShowTourPayPopup(t.bookingId, t.DepositAmountPaid, t.TotalPrice)">Pay Remainder</button>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+        if (hasCancelledBookingsTour)
+        {
+            <h3>Cancelled Tours for late payment</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Tour</th>
+                        <th>Number of People</th>
+                        <th>Start Date</th>
+                        <th>Check Out Date</th>
+                    </tr>
+
+                </thead>
+                <tbody>
+                    @foreach (var t in tourBookings)
+                    {
+
+                        if (t.IsCancelled)
+                        {
+                            <tr>
+                                <td width="5%">@t.TourName</td>
+                                <td width="5%">@t.NumberOfGuests</td>
+                                <td width="5%">@t.CommencementDate.ToString("dd/MM/yyyy")</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+
+            <br />
+            <br />
+        }
+    }
+}
+
+
+@{
+    if (showTourPayPopup)
+    {
+        var remainder = totalToPay - currentlyPaid;
+
+        <div class="backgroundPopupBox">
+            <div class="popupCreate">
+                <h3>Pay Remainder</h3>
+                <p>Are you sure you want to pay the remainder of this tour booking? It will cost you £@remainder </p>
+                <button class="btn btn-success" @onclick="() => PayTourRemainder(bookingId)">Yes</button>
+                <button class="btn btn-danger" @onclick="ClosePopup">No</button>
+            </div>
+        </div>
     }
 }
 
@@ -129,12 +270,16 @@ else
     [CascadingParameter]
     private Task<AuthenticationState>? authenticationState { get; set; }
     private List<HotelBookingViewModel>? hotelBookings;
+    private List<TourBookingViewModel>? tourBookings;
     private string userId;
     private bool disableCancel = false;
     private bool disableModify = false;
-    private bool showPayPopup = false;
+    private bool showHotelPayPopup = false;
+    private bool showTourPayPopup = false;
     private string bookingId;
     private decimal currentlyPaid, totalToPay;
+    private string bookingType;
+    private bool hasCancelledBookingsHotel, hasCancelledBookingsTour = false;
 
 
     protected override async Task OnInitializedAsync()
@@ -149,28 +294,58 @@ else
         {
             hotelBookings = result;
         }
+
+        var result2 = await http.GetFromJsonAsync<List<TourBookingViewModel>>($"api/bookings/tour/userbooking?userId={userId}");
+        if (result2 != null)
+        {
+            tourBookings = result2;
+        }
+
+        if (hotelBookings is not null && hotelBookings.Count > 0)
+        {
+            foreach (var h in hotelBookings)
+            {
+                if (h.IsCancelled)
+                {
+                    hasCancelledBookingsHotel = true;
+                    break;
+                }
+            }
+        }
+
+        if (tourBookings is not null && tourBookings.Count > 0)
+        {
+            foreach (var t in tourBookings)
+            {
+                if (t.IsCancelled)
+                {
+                    hasCancelledBookingsTour = true;
+                    break;
+                }
+            }
+        }
     }
 
-    async Task CancelBooking(string id)
+    async Task CancelHotelBooking(string id)
     {
         var result = await http.DeleteAsync($"api/bookings/hotel/{id}");
         NavigationManager.NavigateTo("/mybookings", true);
     }
 
-    private void ModifyBooking(string id)
+    private void ModifyHotelBooking(string id)
     {
         NavigationManager.NavigateTo($"/editbooking/hotel/{id}");
     }
 
-    private void ShowPayPopup(string id, decimal depoist, decimal total)
+    private void ShowHotelPayPopup(string id, decimal depoist, decimal total)
     {
-        showPayPopup = true;
+        showHotelPayPopup = true;
         bookingId = id;
         currentlyPaid = depoist;
         totalToPay = total;
     }
 
-    private void PayRemainder(string id)
+    private void PayHotelRemainder(string id)
     {
         var result = http.PutAsync($"api/bookings/hotel/payment/{id}", null);
         NavigationManager.NavigateTo("/mybookings", true);
@@ -178,7 +353,32 @@ else
 
     private void ClosePopup()
     {
-        showPayPopup = false;
+        showHotelPayPopup = false;
+        showTourPayPopup = false;
     }
 
+    async Task CancelTourBooking(string id)
+    {
+        var result = await http.DeleteAsync($"api/bookings/tour/{id}");
+        NavigationManager.NavigateTo("/mybookings", true);
+    }
+
+    private void ModifyTourBooking(string id)
+    {
+        NavigationManager.NavigateTo($"/editbooking/tour/{id}");
+    }
+
+    private void ShowTourPayPopup(string id, decimal depoist, decimal total)
+    {
+        showTourPayPopup = true;
+        bookingId = id;
+        currentlyPaid = depoist;
+        totalToPay = total;
+    }
+
+    private void PayTourRemainder(string id)
+    {
+        var result = http.PutAsync($"api/bookings/tour/payment/{id}", null);
+        NavigationManager.NavigateTo("/mybookings", true);
+    }
 }

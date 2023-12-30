@@ -23,57 +23,35 @@
     </div>
 </div>
 
-@* @if(showBookingForm)
+@if(showBookingForm)
 {
     <div class="backgroundPopupBox">
         <div class="popupCreate">
             <EditForm Model=@newBooking OnValidSubmit=BookTour>
                 <DataAnnotationsValidator />
-                <ValidationSummary />
+               @*  <ValidationSummary /> *@
                
                 <div class="form-group">
-                    <label class="control-label">Check-In Date</label>
-                    <InputDate @bind-Value="newBooking.CheckIn" min="@min" max="@max" Placeholder="Enter Date" />
-                    <ValidationMessage For="@(() => newBooking.CheckIn)" />
-                </div>
-                <div class="form-group mt-3 col-sm-10">
-                    <label class="control-label">Room Type</label>
-                    <InputSelect id="roomType" @bind-Value="newBooking.RoomType" placeholder="Room Type">
-                        <option value="">---</option>
-                        @foreach (var room in roomType)
-                        {
-                            <option value="@room">@room</option>
-                        }
-                    </InputSelect>
-                    <ValidationMessage For="@(() => newBooking.RoomType)" />
+                    <label class="control-label">Commencement Date</label>
+                    <InputDate @bind-Value="newBooking.CommencementDate" min="@min" max="@max" Placeholder="Enter Date" />
+                    <ValidationMessage For="@(() => newBooking.CommencementDate)" />
                 </div>
                 <div class="form-group mt-3">
-                    <label class="control-label">Number of nights</label>
-                    <InputNumber id="NumOfNights" @bind-Value="newBooking.NumberOfNights" class="form-control" />
-                    <ValidationMessage For="@(() => newBooking.NumberOfNights)" />
+                    <label class="control-label">Number of guests</label>
+                    <InputNumber id="NumOfGuests" @bind-Value="newBooking.NumberOfPeople" class="form-control" />
+                    <ValidationMessage For="@(() => newBooking.NumberOfPeople)" />
                 </div>
-                
-                @{
-                    switch (newBooking.RoomType)
-                    {
-                        case "Single":
-                            newBooking.TotalPrice = newBooking.NumberOfNights * selectedHotel.SBPrice;
-                            break;
-                        case "Double":
-                            newBooking.TotalPrice = newBooking.NumberOfNights * selectedHotel.DBPrice;
-                            break;
-                        case "Family":
-                            newBooking.TotalPrice = newBooking.NumberOfNights * selectedHotel.FamPrice;
-                            break;
 
-                    }
-                    newBooking.DepositAmountPaid = newBooking.TotalPrice / 5 ;
-                    newBooking.CheckOut = newBooking.CheckIn.AddDays(newBooking.NumberOfNights);
-                  
+                @{
+                    newBooking.TotalPrice = selectedTour.Cost;
+                    newBooking.DepositAmountPaid = newBooking.TotalPrice / 5;
+                    newBooking.EndDate = newBooking.CommencementDate.AddDays(selectedTour.DurationInDays - 1);
                 }
 
-                <div>Check In Date: @newBooking.CheckIn.ToString("dd/MM/yyyy")</div>
-                <div>Check Out Date: @newBooking.CheckOut.ToString("dd/MM/yyyy")</div>
+                    
+                
+                <div>Tour start Date: @newBooking.CommencementDate.ToString("dd/MM/yyyy")</div>
+                <div>Tour End Date: @newBooking.EndDate.ToString("dd/MM/yyyy")</div>
 
 
                 <div>Total Price is £@newBooking.TotalPrice</div>
@@ -83,7 +61,7 @@
                 @if(showOverlap)
                 {
                     <div class="alert alert-danger" role="alert">
-                        <p>There are no more spaces for this room on these dates please select new dates.</p>
+                        <p>There are no more spaces left in this tour for that many people on these dates please select new dates or less people.</p>
                     </div>
                 }
 
@@ -97,12 +75,12 @@
         </div>
     </div>
 
-} *@
+}
 
 
 @code {
     private Tour selectedTour = new Tour();
-    //private HotelBooking newBooking = new HotelBooking();
+    private TourBooking newBooking = new TourBooking();
     private bool showBookingForm = false;
     private string min;
     private string max;
@@ -117,7 +95,6 @@
     public string? Id { get; set; }
 
     List<Tour> tours = new List<Tour>();
-    List<string> roomType = new List<string>() { "Single", "Double", "Family" };
 
     protected override async Task OnInitializedAsync()
     {
@@ -147,27 +124,26 @@
 
         // Need to change for tours 
 
-        //code to check if the newbooking overlaps with existing bookings
-        // numOfOverlap = await http.GetFromJsonAsync<int>($"/api/bookings/hotel/overlap?checkIn={newBooking.CheckIn}&checkOut={newBooking.CheckOut}&hotelId={selectedHotel.Id}&roomType={newBooking.RoomType}");
+        // code to check if the newbooking overlaps with existing bookings
+        numOfOverlap = await http.GetFromJsonAsync<int>($"/api/bookings/tour/overlap?start={newBooking.CommencementDate}&end={newBooking.EndDate}&tourId={selectedTour.Id}");
 
-        // if (numOfOverlap > 20)
-        // {
-        //     showOverlap = true;
-        // } 
-        // else 
-        // {
-        //     newBooking.HotelId = selectedHotel.Id;
-        //     newBooking.UserId = userId;
-        //     newBooking.PaymentDueDate = newBooking.CheckIn.AddDays(-28);
+        if (selectedTour.MaxNumberOfGuests < numOfOverlap + newBooking.NumberOfPeople)
+        {
+            showOverlap = true;
+        } 
+        else 
+        {
+            newBooking.TourId = selectedTour.Id;
+            newBooking.UserId = userId;
+            newBooking.PaymentDueDate = newBooking.CommencementDate.AddDays(-28);
 
-        //     await http.PostAsJsonAsync("/api/bookings/hotel/book", newBooking);
+            
 
-        //     ClosePopup();
-        //     NavigationManager.NavigateTo("/mybookings");
-        // }
+           await http.PostAsJsonAsync("/api/bookings/tour/book", newBooking);
 
-        
-       
+            ClosePopup();
+            NavigationManager.NavigateTo("/mybookings");
+        }
     }
 
     private void ClosePopup()
