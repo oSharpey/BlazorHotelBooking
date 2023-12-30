@@ -68,7 +68,6 @@ else
                             <button class="btn btn-danger" disabled="@disableCancel" @onclick="() => CancelBooking(h.bookingId)">Cancel</button>
                         </td>
                         <td width="5%">
-                            @* Need to fix this so you can only pay in full up to 28 days then it gets cancelled *@
                             <button class="btn btn-success" disabled="@h.paidInfull" @onclick="() => ShowPayPopup(h.bookingId, h.DepositAmountPaid, h.TotalPrice)">Pay Remainder</button>
                         </td>
                     </tr>
