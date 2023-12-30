@@ -1,0 +1,61 @@
+﻿@page "/tours"
+@using BlazorHotelBooking.Shared
+@using Microsoft.AspNetCore.Authorization
+@inject HttpClient http
+@attribute [Authorize]
+
+<h3>Tours</h3>
+
+<input @oninput="Search" placeholder="Search..." class="p-3" />
+
+
+@if (tours.Count <= 0)
+{
+    <span> Loading Hotels...</span>
+}
+else
+{
+    @foreach (var tour in tours)
+    {
+        <li class="media my-3">
+            <div class="media-body">
+                <a href="/hotels/@tour.Id">
+                    <h4 class="mb-0">@tour.Name</h4>
+                </a>
+                <p>@tour.Description</p>
+                <p>Max Number of Guests: @tour.MaxNumberOfGuests</p>
+                <h6 class="price">
+                    £@tour.Cost
+                </h6>
+            </div>
+        </li>
+    }
+}
+
+@code {
+    List<Tour> tours = new List<Tour>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await http.GetFromJsonAsync<List<Tour>>("/api/tour");
+        if (result != null)
+        {
+            tours = result;
+        }
+    }
+
+    private async void Search(ChangeEventArgs args)
+    {
+        var searchTerm = (string)args.Value;
+       
+        var result = await http.GetFromJsonAsync<List<Tour>>("/api/tour");
+        // make it case insensitive to search hotels
+
+        tours = result.Where(x => x.Name.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
+               .OrderByDescending(x => x.Id)
+               .ToList();
+
+        StateHasChanged();
+    }
+
+}
