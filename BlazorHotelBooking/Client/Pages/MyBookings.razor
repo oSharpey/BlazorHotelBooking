@@ -85,35 +85,40 @@ else
         </table>
 
 
-        <br />
-        <br />
-        <h6>Cancelled Hotels for late payment</h6>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Hotel</th>
-                    <th>Room Type</th>
-                    <th>Check In Date</th>
-                    <th>Check Out Date</th>
-                </tr>
 
-            </thead>
-            <tbody>
-                @foreach (var h in hotelBookings)
-                {
+        if (hasCancelledBookingsHotel)
+        {
+            <h3>Cancelled Hotels for late payment</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Hotel</th>
+                        <th>Room Type</th>
+                        <th>Check In Date</th>
+                        <th>Check Out Date</th>
+                    </tr>
 
-                    if (h.IsCancelled)
+                </thead>
+                <tbody>
+                    @foreach (var h in hotelBookings)
                     {
-                        <tr>
-                            <td width="5%">@h.hotelName</td>
-                            <td width="5%">@h.RoomType Room</td>
-                            <td width="5%">@h.CheckIn.ToString("dd/MM/yyyy")</td>
-                            <td width="5%">@h.CheckOut.ToString("dd/MM/yyyy")</td>
-                        </tr>
+
+                        if (h.IsCancelled)
+                        {
+                            <tr>
+                                <td width="5%">@h.hotelName</td>
+                                <td width="5%">@h.RoomType Room</td>
+                                <td width="5%">@h.CheckIn.ToString("dd/MM/yyyy")</td>
+                                <td width="5%">@h.CheckOut.ToString("dd/MM/yyyy")</td>
+                            </tr>
+                        }
                     }
-                }
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+
+            <br />
+            <br />
+        }
     }
 }
 
@@ -205,6 +210,39 @@ else
                 }
             </tbody>
         </table>
+
+        if (hasCancelledBookingsTour)
+        {
+            <h3>Cancelled Tours for late payment</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Tour</th>
+                        <th>Number of People</th>
+                        <th>Start Date</th>
+                        <th>Check Out Date</th>
+                    </tr>
+
+                </thead>
+                <tbody>
+                    @foreach (var t in tourBookings)
+                    {
+
+                        if (t.IsCancelled)
+                        {
+                            <tr>
+                                <td width="5%">@t.TourName</td>
+                                <td width="5%">@t.NumberOfGuests</td>
+                                <td width="5%">@t.CommencementDate.ToString("dd/MM/yyyy")</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+
+            <br />
+            <br />
+        }
     }
 }
 
@@ -241,6 +279,7 @@ else
     private string bookingId;
     private decimal currentlyPaid, totalToPay;
     private string bookingType;
+    private bool hasCancelledBookingsHotel, hasCancelledBookingsTour = false;
 
 
     protected override async Task OnInitializedAsync()
@@ -260,6 +299,30 @@ else
         if (result2 != null)
         {
             tourBookings = result2;
+        }
+
+        if (hotelBookings is not null && hotelBookings.Count > 0)
+        {
+            foreach (var h in hotelBookings)
+            {
+                if (h.IsCancelled)
+                {
+                    hasCancelledBookingsHotel = true;
+                    break;
+                }
+            }
+        }
+
+        if (tourBookings is not null && tourBookings.Count > 0)
+        {
+            foreach (var t in tourBookings)
+            {
+                if (t.IsCancelled)
+                {
+                    hasCancelledBookingsTour = true;
+                    break;
+                }
+            }
         }
     }
 
