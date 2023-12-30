@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace BlazorHotelBooking.Shared
 {
-    internal class Tour
+    public class Tour
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         [Column(TypeName = "decimal(18,2")]
         public decimal Cost { get; set; }
-        [Column(TypeName = "decimal(18,2")]
         public int DurationInDays { get; set; }
+        public int MaxNumberOfGuests { get; set; }
         public string? Description { get; set; }
 
     }

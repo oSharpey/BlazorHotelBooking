@@ -13,13 +13,10 @@ namespace BlazorHotelBooking.Server.Data
         }
         public DbSet<Hotel> Hotels { get; set; }
         public DbSet<HotelBooking> HotelBookings => Set<HotelBooking>();
+        public DbSet<Tour> Tours { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
-
-
-
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<IdentityRole>().HasData(new IdentityRole
@@ -38,8 +35,6 @@ namespace BlazorHotelBooking.Server.Data
                 Id = "2",
                 ConcurrencyStamp = Guid.NewGuid().ToString()
             });
-
-
 
             modelBuilder.Entity<Hotel>().HasData(
                  new Hotel
@@ -100,6 +95,36 @@ namespace BlazorHotelBooking.Server.Data
                     DBPrice = 100,
                     FamPrice = 155,
                     Description = "Nestled in the Scottish Highlands, this inn offers a serene getaway with scenic views, perfect for outdoor enthusiasts and nature lovers"
+                }
+            );
+
+            modelBuilder.Entity<Tour>().HasData(
+                new Tour
+                {
+                    Id = 1,
+                    Name = "Real Britain",
+                    Cost = 1200,
+                    DurationInDays = 6,
+                    MaxNumberOfGuests = 30,
+                    Description = "Dive into charming villages, rolling hills, and iconic castles in this 6-day escape to authentic Britain"
+                },
+                new Tour
+                {
+                    Id = 2,
+                    Name = "Britain and Ireland Explorer",
+                    Cost = 2000,
+                    DurationInDays = 16,
+                    MaxNumberOfGuests = 40,
+                    Description = "Journey through 16 days of cityscapes, dramatic coasts, and Celtic charm. Uncover the best of Britain and Ireland."
+                },
+                new Tour
+                {
+                    Id = 3,
+                    Name = "Best of Britain",
+                    Cost = 2900,
+                    DurationInDays = 12,
+                    MaxNumberOfGuests = 30,
+                    Description = "Indulge in 12 days of luxury. Explore stately homes, savor Michelin stars, and discover hidden gems of Britain's finest"
                 }
             );
         }
