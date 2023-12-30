@@ -23,6 +23,11 @@ namespace BlazorHotelBooking.Server.Controllers
             _context = context;
         }
 
+
+
+        //Bookking for Hotels
+
+
         [HttpGet("hotel/userbooking")]
         public async Task<ActionResult<List<HotelBookingViewModel>>> GetAllBookingsWithUserId(string userId)
         {

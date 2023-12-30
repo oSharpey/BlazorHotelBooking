@@ -4,6 +4,7 @@ using BlazorHotelBooking.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorHotelBooking.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20231230191948_BookingTourClass")]
+    partial class BookingTourClass
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -323,7 +326,7 @@ namespace BlazorHotelBooking.Server.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TourBookings");
+                    b.ToTable("TourBookins");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -356,14 +359,14 @@ namespace BlazorHotelBooking.Server.Migrations
                         new
                         {
                             Id = "1",
-                            ConcurrencyStamp = "34d39ab6-937d-467b-ad8d-2cbf29f69f87",
+                            ConcurrencyStamp = "10709ebd-38a6-4bad-97c9-c37eba0f4ec1",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = "2",
-                            ConcurrencyStamp = "f0607d7b-526c-437f-b1a4-3871ac3f9ac2",
+                            ConcurrencyStamp = "72158d74-18ea-40e1-8168-b751d48d357d",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
