@@ -272,7 +272,7 @@ else
 {
     if (packageBookings.Count == 0)
     {
-        <h3>You have no tour bookings</h3>
+        <h3>You have no Package bookings</h3>
     }
     else
     {
@@ -343,13 +343,13 @@ else
                             <td width="5%">£@p.TotalPrice</td>
                             <td width="5%">@p.PaymentDueDate.ToString("dd/MM/yyyy")</td>
                             <td width="5%">
-                                <button class="btn btn-primary" disabled="@disableModify" @onclick="() => ModifyTourBooking(p.bookingId)">Modify</button>
+                                <button class="btn btn-primary" disabled="@disableModify" @onclick="() => ModifyPackageBooking(p.bookingId)">Modify</button>
                             </td>
                             <td width="5%">
-                                <button class="btn btn-danger" disabled="@disableCancel" @onclick="() => CancelTourBooking(p.bookingId)">Cancel</button>
+                                <button class="btn btn-danger" disabled="@disableCancel" @onclick="() => CancelPackageBooking(p.bookingId)">Cancel</button>
                             </td>
                             <td width="5%">
-                                <button class="btn btn-success" disabled="@p.paidInfull" @onclick="() => ShowTourPayPopup(p.bookingId, p.DepositAmountPaid, p.TotalPrice)">Pay Remainder</button>
+                                <button class="btn btn-success" disabled="@p.paidInfull" @onclick="() => ShowPackagePayPopup(p.bookingId, p.DepositAmountPaid, p.TotalPrice)">Pay Remainder</button>
                             </td>
                         </tr>
                     }
@@ -400,7 +400,7 @@ else
 
 
 @{
-    if (showTourPayPopup)
+    if (showPackagePayPopup)
     {
         var remainder = totalToPay - currentlyPaid;
 
@@ -408,7 +408,7 @@ else
             <div class="popupCreate">
                 <h3>Pay Remainder</h3>
                 <p>Are you sure you want to pay the remainder of this tour booking? It will cost you £@remainder </p>
-                <button class="btn btn-success" @onclick="() => PayTourRemainder(bookingId)">Yes</button>
+                <button class="btn btn-success" @onclick="() => PayPackageRemainder(bookingId)">Yes</button>
                 <button class="btn btn-danger" @onclick="ClosePopup">No</button>
             </div>
         </div>
@@ -429,6 +429,7 @@ else
     private bool disableModify = false;
     private bool showHotelPayPopup = false;
     private bool showTourPayPopup = false;
+    private bool showPackagePayPopup = false;
     private string bookingId;
     private decimal currentlyPaid, totalToPay;
     private string bookingType;
@@ -553,4 +554,32 @@ else
         var result = http.PutAsync($"api/bookings/tour/payment/{id}", null);
         NavigationManager.NavigateTo("/mybookings", true);
     }
+
+    async Task CancelPackageBooking(string id)
+    {
+        var result = await http.DeleteAsync($"api/bookings/package/{id}");
+        NavigationManager.NavigateTo("/mybookings", true);
+    }
+
+    private void ModifyPackageBooking(string id)
+    {
+        NavigationManager.NavigateTo($"/editbooking/package/{id}");
+    }
+
+    private void ShowPackagePayPopup(string id, decimal depoist, decimal total)
+    {
+        showPackagePayPopup = true;
+        bookingId = id;
+        currentlyPaid = depoist;
+        totalToPay = total;
+    }
+
+    private void PayPackageRemainder(string id)
+    {
+        var result = http.PutAsync($"api/bookings/package/payment/{id}", null);
+        NavigationManager.NavigateTo("/mybookings", true);
+    }
+
+
 }
+
