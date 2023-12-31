@@ -1,8 +1,11 @@
 ﻿@page "/packages"
 @using BlazorHotelBooking.Shared
 @using Microsoft.AspNetCore.Authorization
+@using System.Security.Claims
 @inject HttpClient http
 @attribute [Authorize]
+@inject NavigationManager NavigationManager
+
 
 <h3>Packages </h3>
 
@@ -44,6 +47,121 @@ else
 
     @if (showBookingForm)
     {
+
+        <div class="backgroundPopupBox">
+        <div class="popupCreate">
+            <EditForm Model=@newBooking OnValidSubmit=BookPackage>
+                <DataAnnotationsValidator />
+               @*  <ValidationSummary /> *@
+               
+                <div class="form-group">
+                    <label class="control-label">Check-In Date</label>
+                    <InputDate @bind-Value="newBooking.HotelCheckIn" min="@min" max="@max" Placeholder="Enter Date" />
+                    <ValidationMessage For="@(() => newBooking.HotelCheckIn)" />
+                </div>
+                <div class="form-group mt-3 col-sm-10">
+                    <label class="control-label">Room Type</label>
+                    <InputSelect id="roomType" @bind-Value="newBooking.RoomType" placeholder="Room Type">
+                        <option value="">---</option>
+                        @foreach (var room in roomType)
+                        {
+                            <option value="@room">@room</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="@(() => newBooking.RoomType)" />
+                </div>
+                <div class="form-group mt-3">
+                    <label class="control-label">Number of nights</label>
+                    <InputNumber id="NumOfNights" @bind-Value="newBooking.NumberOfNights" class="form-control" />
+                    <ValidationMessage For="@(() => newBooking.NumberOfNights)" />
+                </div>
+                
+                @{
+                    switch (newBooking.RoomType)
+                    {
+                        case "Single":
+                            newBooking.TotalPrice = newBooking.NumberOfNights * selectedHotel.SBPrice;
+                            break;
+                        case "Double":
+                            newBooking.TotalPrice = newBooking.NumberOfNights * selectedHotel.DBPrice;
+                            break;
+                        case "Family":
+                            newBooking.TotalPrice = newBooking.NumberOfNights * selectedHotel.FamPrice;
+                            break;
+
+                    }
+                    newBooking.HotelCheckOut = newBooking.HotelCheckIn.AddDays(newBooking.NumberOfNights);
+                  
+                }
+
+                <div>Check In Date: @newBooking.HotelCheckIn.ToString("dd/MM/yyyy")</div>
+                <div>Check Out Date: @newBooking.HotelCheckOut.ToString("dd/MM/yyyy")</div>
+
+
+
+                <div class="form-group">
+                    <label class="control-label">Tour Start Date</label>
+                    <InputDate @bind-Value="newBooking.TourStartDate" min="@min" max="@max" Placeholder="Enter Date" />
+                    <ValidationMessage For="@(() => newBooking.TourStartDate)" />
+                </div>
+                <div class="form-group mt-3">
+                    <label class="control-label">Number of guests</label>
+                    <InputNumber id="NumOfGuests" @bind-Value="newBooking.NumberOfPeopleOnTour" class="form-control" />
+                    <ValidationMessage For="@(() => newBooking.NumberOfPeopleOnTour)" />
+                </div>
+
+                    <div>Tour start Date: @newBooking.TourStartDate.ToString("dd/MM/yyyy")</div>
+                    <div>Tour End Date: @newBooking.TourEndDate.ToString("dd/MM/yyyy")</div>
+
+                    @{
+                        newBooking.TourEndDate = newBooking.TourStartDate.AddDays(selectedTour.DurationInDays - 1);
+                        newBooking.TotalPrice += selectedTour.Cost;
+
+                        switch(newBooking.RoomType)
+                        {
+                            case "Single":
+                                newBooking.TotalPrice = newBooking.TotalPrice * (decimal)0.9;
+                                <p>(Single room includes 10% discount)</p>
+                                break;
+                            case "Double":
+                                newBooking.TotalPrice = newBooking.TotalPrice * (decimal)0.8;
+                                <p>(Double room includes 20% discount)</p>
+                                break;
+                            case "Family":
+                                newBooking.TotalPrice = newBooking.TotalPrice * (decimal)0.6;
+                                <p>(Family room includes 40% discount)</p>
+                                break;
+                        }
+
+                        newBooking.DepositAmountPaid = newBooking.TotalPrice / 5;
+                    }
+
+                    <div>Total Price is £@newBooking.TotalPrice</div>
+                    <div>Total to pay today (20%) £@newBooking.DepositAmountPaid</div>
+
+                @if(showHotelOverlap)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        <p>There are no more spaces for this room on these dates please select new dates.</p>
+                    </div>
+                }
+                
+                @if(showTourOverlap)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        <p>There are no more spaces left in this tour for that many people on these dates please select new dates or less people.</p>
+                    </div>
+                }
+
+                <button type="button" class="btn btn-success" @onclick="BookPackage">Book</button>
+
+            </EditForm>
+
+            <div class="form-group">
+                <button class="btn btn-danger" @onclick="ClosePopup">Cancel</button>
+            </div>
+        </div>
+    </div>
         
     }
 
@@ -58,17 +176,38 @@ else
 @code {
     List<Hotel> hotels = new List<Hotel>();
     List<Tour> tours = new List<Tour>();
+    Hotel selectedHotel = new Hotel();
+    Tour selectedTour = new Tour();
     private PackageBooking newBooking = new PackageBooking();
     private bool showBookingForm = false;
+    List<string> roomType = new List<string>() { "Single", "Double", "Family" };
+    private string min;
+    private string max;
+    private string userId;
+    private int numOfTourOverlap, numOfHotelOverlap;
+    private bool showHotelOverlap, showTourOverlap = false;
+
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
+
 
     protected override async Task OnInitializedAsync()
     {
+
+        min = DateOnly.FromDateTime(DateTime.Now.Date.AddMonths(2)).ToString("yyyy-MM-dd");
+        max = DateOnly.FromDateTime(DateTime.Now.Date.AddYears(5)).ToString("yyyy-MM-dd");
+
+        var authState = await authenticationState;
+        var user = authState?.User;
+        userId = user?.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
         var result = await http.GetFromJsonAsync<List<Hotel>>("/api/hotel");
         if (result != null)
         {
             hotels = result;
         }
-        
+
         var result2 = await http.GetFromJsonAsync<List<Tour>>("/api/tour");
         if (result2 != null)
         {
@@ -93,16 +232,50 @@ else
     private void ShowPackagePopup()
     {
         showBookingForm = true;
+
+
+        selectedHotel = hotels.FirstOrDefault(h => h.Id == newBooking.HotelId);
+        selectedTour = tours.FirstOrDefault(h => h.Id == newBooking.TourId);
+
+    }
+
+    private void ClosePopup()
+    {
+        showBookingForm = false;
     }
 
 
-async Task BookPackage()
+    async Task BookPackage()
     {
-        var response = await http.PostAsJsonAsync("", newBooking);
-        if (response.IsSuccessStatusCode)
+
+
+        numOfHotelOverlap = await http.GetFromJsonAsync<int>($"/api/bookings/hotel/overlap?checkIn={newBooking.HotelCheckIn}&checkOut={newBooking.HotelCheckOut}&hotelId={selectedHotel.Id}&roomType={newBooking.RoomType}");
+
+        numOfTourOverlap = await http.GetFromJsonAsync<int>($"/api/bookings/tour/overlap?start={newBooking.TourStartDate}&end={newBooking.TourEndDate}&tourId={selectedTour.Id}");
+
+        if ((selectedTour.MaxNumberOfGuests < numOfTourOverlap + newBooking.NumberOfPeopleOnTour) & (numOfHotelOverlap > 20))
         {
-            showBookingForm = false;
-            StateHasChanged();
+            showHotelOverlap = true;
+            showTourOverlap = true;
+        }
+        else
+        {
+            newBooking.UserId = userId;
+            
+            if (newBooking.TourStartDate < newBooking.HotelCheckIn)
+            {
+                newBooking.PaymentDueDate = newBooking.TourStartDate.AddDays(-28);
+            }
+            else
+            {
+                newBooking.PaymentDueDate = newBooking.HotelCheckIn.AddDays(-28);
+            }
+
+
+            await http.PostAsJsonAsync("/api/bookings/package/book", newBooking);
+
+            ClosePopup();
+            NavigationManager.NavigateTo("/mybookings");
         }
     }
 }
