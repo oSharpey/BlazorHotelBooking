@@ -1,0 +1,108 @@
+﻿@page "/packages"
+@using BlazorHotelBooking.Shared
+@using Microsoft.AspNetCore.Authorization
+@inject HttpClient http
+@attribute [Authorize]
+
+<h3>Packages </h3>
+
+
+
+@if (hotels.Count <= 0 || tours.Count <= 0)
+{
+    <span> Loading...</span>
+}
+else
+{
+    <EditForm Model=@newBooking OnValidSubmit=ShowPackagePopup>
+        <DataAnnotationsValidator />
+        @*  <ValidationSummary /> *@
+
+        <div class="form-group">
+            <label class="control-label">Choose Hotel</label>
+            <InputSelect id="Hotel" @bind-Value="newBooking.HotelId" placeholder="Hotel">
+                
+                @foreach (var hotel in hotels)
+                {
+                    <option value="@hotel.Id">@hotel.Name</option>
+                }
+            </InputSelect>
+        </div>
+        <div class="form-group">
+            <label class="control-label">Choose Tour</label>
+            <InputSelect id="Tour" @bind-Value="newBooking.TourId" placeholder="Hotel">
+                @foreach (var tour in tours)
+                {
+                    <option value="@tour.Id">@tour.Name</option>
+                }
+            </InputSelect>
+        </div>
+        <button type="button" class="btn btn-success" @onclick="ShowPackagePopup">Book</button>
+    </EditForm>
+
+
+
+    @if (showBookingForm)
+    {
+        
+    }
+
+
+
+
+}
+
+
+
+
+@code {
+    List<Hotel> hotels = new List<Hotel>();
+    List<Tour> tours = new List<Tour>();
+    private PackageBooking newBooking = new PackageBooking();
+    private bool showBookingForm = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await http.GetFromJsonAsync<List<Hotel>>("/api/hotel");
+        if (result != null)
+        {
+            hotels = result;
+        }
+        
+        var result2 = await http.GetFromJsonAsync<List<Tour>>("/api/tour");
+        if (result2 != null)
+        {
+            tours = result2;
+        }
+    }
+
+    private async void Search(ChangeEventArgs args)
+    {
+        var searchTerm = (string)args.Value;
+
+        var result = await http.GetFromJsonAsync<List<Hotel>>("/api/hotel");
+        // make it case insensitive to search hotels
+
+        hotels = result.Where(x => x.Name.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
+               .OrderByDescending(x => x.Id)
+               .ToList();
+
+        StateHasChanged();
+    }
+
+    private void ShowPackagePopup()
+    {
+        showBookingForm = true;
+    }
+
+
+async Task BookPackage()
+    {
+        var response = await http.PostAsJsonAsync("", newBooking);
+        if (response.IsSuccessStatusCode)
+        {
+            showBookingForm = false;
+            StateHasChanged();
+        }
+    }
+}
