@@ -264,6 +264,158 @@ else
 }
 
 
+@if (packageBookings is null)
+{
+    <h3>Loading Packages…</h3>
+}
+else
+{
+    if (packageBookings.Count == 0)
+    {
+        <h3>You have no tour bookings</h3>
+    }
+    else
+    {
+        <h2>Packages</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Tour</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Number of Guests</th>
+                    <th>Hotel</th>
+                    <th>Room Type</th>
+                    <th>Check In Date</th>
+                    <th>Check Out Date</th>
+                    <th>Number of Nights</th>
+                    <th>Amount Paid so Far</th>
+                    <th>Total Cost</th>
+                    <th>Payment Due Date</th>
+                </tr>
+
+            </thead>
+            <tbody>
+                @foreach (var p in packageBookings)
+                {
+
+                    if (!p.IsCancelled)
+                    {
+                        disableCancel = false;
+                        disableModify = false;
+
+
+                        var today = DateTime.Now;
+                        
+                        TimeSpan datediff = new TimeSpan();
+
+                        if(p.CheckIn > p.CommencementDate)
+                        {
+                           datediff = p.CommencementDate - today;
+                        }
+                        else
+                        {
+                           datediff = p.CheckIn - today;
+                        }
+
+                        if (datediff.Days < 5)
+                        {
+                            disableCancel = true;
+                        }
+
+                        if (datediff.Days < 14)
+                        {
+                            disableModify = true;
+                        }
+
+
+                        <tr>
+                            <td width="5%">@p.TourName</td>
+                            <td width="5%">@p.CommencementDate.ToString("dd/MM/yyy")</td>
+                            <td width="5%">@p.EndDate.ToString("dd/MM/yyyy")</td>
+                            <td width="5%">@p.NumberOfGuests people</td>
+                            <td width="5%">@p.hotelName</td>
+                            <td width="5%">@p.RoomType Room</td>
+                            <td width="5%">@p.CheckIn.ToString("dd/MM/yyyy")</td>
+                            <td width="5%">@p.CheckOut.ToString("dd/MM/yyyy")</td>
+                            <td width="5%">@p.NumberOfNights Nights</td>
+                            <td width="5%">£@p.DepositAmountPaid</td>
+                            <td width="5%">£@p.TotalPrice</td>
+                            <td width="5%">@p.PaymentDueDate.ToString("dd/MM/yyyy")</td>
+                            <td width="5%">
+                                <button class="btn btn-primary" disabled="@disableModify" @onclick="() => ModifyTourBooking(p.bookingId)">Modify</button>
+                            </td>
+                            <td width="5%">
+                                <button class="btn btn-danger" disabled="@disableCancel" @onclick="() => CancelTourBooking(p.bookingId)">Cancel</button>
+                            </td>
+                            <td width="5%">
+                                <button class="btn btn-success" disabled="@p.paidInfull" @onclick="() => ShowTourPayPopup(p.bookingId, p.DepositAmountPaid, p.TotalPrice)">Pay Remainder</button>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+        if (hasCancelledPackage)
+        {
+            <h3>Cancelled Packages for late payment</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Tour</th>
+                        <th>Number of People</th>
+                        <th>Start Date</th>
+                        <th>Check Out Date</th>
+                        <th>Hotel</th>
+                        <th>Room Type</th>
+                        <th>Check In Date</th>
+                    </tr>
+
+                </thead>
+                <tbody>
+                    @foreach (var p in packageBookings)
+                    {
+
+                        if (p.IsCancelled)
+                        {
+                            <tr>
+                                <td width="5%">@p.TourName</td>
+                                <td width="5%">@p.NumberOfGuests</td>
+                                <td width="5%">@p.CommencementDate.ToString("dd/MM/yyyy")</td>
+                                <td width="5%">@p.hotelName</td>
+                                <td width="5%">@p.RoomType Room</td>
+                                <td width="5%">@p.CheckIn.ToString("dd/MM/yyyy")</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+
+            <br />
+            <br />
+        }
+    }
+}
+
+
+@{
+    if (showTourPayPopup)
+    {
+        var remainder = totalToPay - currentlyPaid;
+
+        <div class="backgroundPopupBox">
+            <div class="popupCreate">
+                <h3>Pay Remainder</h3>
+                <p>Are you sure you want to pay the remainder of this tour booking? It will cost you £@remainder </p>
+                <button class="btn btn-success" @onclick="() => PayTourRemainder(bookingId)">Yes</button>
+                <button class="btn btn-danger" @onclick="ClosePopup">No</button>
+            </div>
+        </div>
+    }
+}
+
+
 @code {
 
 
@@ -271,6 +423,7 @@ else
     private Task<AuthenticationState>? authenticationState { get; set; }
     private List<HotelBookingViewModel>? hotelBookings;
     private List<TourBookingViewModel>? tourBookings;
+    private List<PackageBookingViewModel>? packageBookings;
     private string userId;
     private bool disableCancel = false;
     private bool disableModify = false;
@@ -279,7 +432,8 @@ else
     private string bookingId;
     private decimal currentlyPaid, totalToPay;
     private string bookingType;
-    private bool hasCancelledBookingsHotel, hasCancelledBookingsTour = false;
+    private bool hasCancelledBookingsHotel, hasCancelledBookingsTour, hasCancelledPackage = false;
+    
 
 
     protected override async Task OnInitializedAsync()
@@ -301,6 +455,12 @@ else
             tourBookings = result2;
         }
 
+        var result3 = await http.GetFromJsonAsync<List<PackageBookingViewModel>>($"api/bookings/package/userbooking?userId={userId}");
+        if (result3 != null)
+        {
+            packageBookings = result3;
+        }
+
         if (hotelBookings is not null && hotelBookings.Count > 0)
         {
             foreach (var h in hotelBookings)
@@ -320,6 +480,18 @@ else
                 if (t.IsCancelled)
                 {
                     hasCancelledBookingsTour = true;
+                    break;
+                }
+            }
+        }
+
+        if (packageBookings is not null && packageBookings.Count > 0)
+        {
+            foreach (var p in packageBookings)
+            {
+                if (p.IsCancelled)
+                {
+                    hasCancelledPackage = true;
                     break;
                 }
             }
