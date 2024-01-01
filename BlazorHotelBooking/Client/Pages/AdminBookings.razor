@@ -1,0 +1,186 @@
+﻿@page "/admin/bookings"
+@using BlazorHotelBooking.Shared
+@using Microsoft.AspNetCore.Authorization
+@using System.Security.Claims
+@inject HttpClient http
+@inject NavigationManager NavigationManager
+@attribute [Authorize(Roles ="Admin")]
+
+
+@if (hotel is null)
+{
+    <span>Loading hotels…</span>
+}
+else
+{
+    <h5>Hotel Bookings</h5>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>User ID</th>
+                <th>Booking ID</th>
+                <th>Hotel ID</th>
+                <th>Room Type</th>
+                <th>Check in</th>
+                <th>Check Out</th>
+                <th>Nights</th>
+                <th>Deposit</th>
+                <th>Total Price</th>
+                <th>Paid In Full</th>
+                <th>Cancelled</th>
+            </tr>
+
+        </thead>
+        <tbody>
+            @foreach (var h in hotel)
+            {
+                <tr>
+                    <td width="5%">@h.UserId</td>
+                    <td width="5%">@h.Id</td>
+                    <td width="5%">@h.HotelId</td>
+                    <td width="5%">@h.RoomType</td>
+                    <td width="5%">@h.CheckIn</td>
+                    <td width="5%">@h.CheckOut</td>
+                    <td width="5%">@h.NumberOfNights</td>
+                    <td width="5%">@h.DepositAmountPaid</td>
+                    <td width="5%">@h.TotalPrice</td>
+                    <td width="5%">@h.PaidInfull</td>
+                    <td width="5%">@h.IsCancelled</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (tour is null)
+{
+    <span>Loading tours…</span>
+}
+else
+{
+    <h5>Tour Bookings</h5>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>User ID</th>
+                <th>Booking ID</th>
+                <th>Tour ID</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Num Of People</th>
+                <th>Deposit</th>
+                <th>Total Price</th>
+                <th>Paid In Full</th>
+                <th>Cancelled</th>
+            </tr>
+
+        </thead>
+        <tbody>
+            @foreach (var t in tour)
+            {
+                <tr>
+                    <td width="5%">@t.UserId</td>
+                    <td width="5%">@t.Id</td>
+                    <td width="5%">@t.TourId</td>
+                    <td width="5%">@t.CommencementDate</td>
+                    <td width="5%">@t.EndDate</td>
+                    <td width="5%">@t.NumberOfPeople</td>
+                    <td width="5%">@t.DepositAmountPaid</td>
+                    <td width="5%">@t.TotalPrice</td>
+                    <td width="5%">@t.PaidInfull</td>
+                    <td width="5%">@t.IsCancelled</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (package is null)
+{
+    <span>Loading packages…</span>
+}
+else
+{
+    <h5>Package Bookings</h5>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>User ID</th>
+                <th>Booking ID</th>
+                <th>Tour ID</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Num Of People</th>
+                <th>Hotel ID</th>
+                <th>Room Type</th>
+                <th>Check in</th>
+                <th>Check Out</th>
+                <th>Nights</th>
+                <th>Deposit</th>
+                <th>Total Price</th>
+                <th>Paid In Full</th>
+                <th>Cancelled</th>
+            </tr>
+
+        </thead>
+        <tbody>
+            @foreach (var p in package)
+            {
+                <tr>
+                    <td width="5%">@p.UserId</td>
+                    <td width="5%">@p.Id</td>
+                    <td width="5%">@p.TourId</td>
+                    <td width="5%">@p.TourStartDate</td>
+                    <td width="5%">@p.TourEndDate</td>
+                    <td width="5%">@p.NumberOfPeopleOnTour</td>
+                    <td width="5%">@p.HotelId</td>
+                    <td width="5%">@p.RoomType</td>
+                    <td width="5%">@p.HotelCheckIn</td>
+                    <td width="5%">@p.HotelCheckOut</td>
+                    <td width="5%">@p.NumberOfNights</td>
+                    <td width="5%">@p.DepositAmountPaid</td>
+                    <td width="5%">@p.TotalPrice</td>
+                    <td width="5%">@p.PaidInfull</td>
+                    <td width="5%">@p.IsCancelled</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+@code {
+    List<HotelBooking> hotel = new List<HotelBooking>();
+    List<TourBooking> tour = new List<TourBooking>();
+    List<PackageBooking> package = new List<PackageBooking>();
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await http.GetFromJsonAsync<List<HotelBooking>>($"/api/Admin/hotelbooking");
+        if (result != null)
+        {
+            hotel = result;
+        }
+
+        var result2 = await http.GetFromJsonAsync<List<TourBooking>>($"/api/Admin/tourbooking");
+        if (result2 != null)
+        {
+            tour = result2;
+        }
+
+        var result3 = await http.GetFromJsonAsync<List<PackageBooking>>($"/api/Admin/packagebooking");
+        if (result3 != null)
+        {
+            package = result3;
+        }
+
+    }
+
+   
+}

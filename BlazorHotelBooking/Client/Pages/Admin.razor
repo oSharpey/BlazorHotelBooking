@@ -8,6 +8,8 @@
 <h3>Admin Page</h3>
 
 <button @onclick="ViewPayments" class="btn btn-success">View All Payments</button>
+<button @onclick="ViewBookings" class="btn btn-success">View All Bookings</button>
+
 <br />
 <br />
 
@@ -135,8 +137,13 @@ else
         NavigationManager.NavigateTo($"/touredit/{id}");
     }
 
-private void ViewPayments()
+    private void ViewPayments()
     {
         NavigationManager.NavigateTo("/admin/payments");
+    }
+
+    private void ViewBookings()
+    {
+        NavigationManager.NavigateTo("/admin/bookings");
     }
 }
