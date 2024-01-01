@@ -6,6 +6,11 @@
 @attribute [Authorize(Roles = "Admin")]
 
 <h3>Admin Page</h3>
+
+<button @onclick="ViewPayments" class="btn btn-success">View All Payments</button>
+<br />
+<br />
+
 <button @onclick="AddHotel" class="btn btn-primary">Add Hotel</button>
 <br />
 
@@ -128,5 +133,10 @@ else
     private void EditTour(int id)
     {
         NavigationManager.NavigateTo($"/touredit/{id}");
+    }
+
+private void ViewPayments()
+    {
+        NavigationManager.NavigateTo("/admin/payments");
     }
 }

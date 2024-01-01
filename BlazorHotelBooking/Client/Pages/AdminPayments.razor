@@ -1,10 +1,11 @@
-﻿@page "/payments"
+﻿@page "/admin/payments"
 @using BlazorHotelBooking.Shared
 @using Microsoft.AspNetCore.Authorization
 @using System.Security.Claims
 @inject HttpClient http
 @inject NavigationManager NavigationManager
-@attribute [Authorize]
+@attribute [Authorize(Roles ="Admin")]
+
 
 @if (payments is null)
 {
@@ -17,6 +18,7 @@ else
     <table class="table">
         <thead>
             <tr>
+                <th>User ID</th>
                 <th>Booking ID</th>
                 <th>Booking Type</th>
                 <th>Payment Type</th>
@@ -29,6 +31,7 @@ else
             @foreach (var p in payments)
             {
                 <tr>
+                    <td width="5%">@p.UserId</td>
                     <td width="5%">@p.bookingId</td>
                     <td width="5%">@p.bookingType</td>
                     <td width="5%">@p.paymentType</td>
@@ -49,26 +52,14 @@ else
 
     [CascadingParameter]
     private Task<AuthenticationState>? authenticationState { get; set; }
-    private string userId;
 
     protected override async Task OnInitializedAsync()
     {
-
-
-        var authState = await authenticationState;
-        var user = authState?.User;
-        userId = user?.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
-
-        var result = await http.GetFromJsonAsync<List<Payments>>($"/api/Payment/{userId}");
+        var result = await http.GetFromJsonAsync<List<Payments>>($"/api/Payment");
         if (result != null)
         {
             payments = result;
         }
-
-       
-
-
     }
 
    
