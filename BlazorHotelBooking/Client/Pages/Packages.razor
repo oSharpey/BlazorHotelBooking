@@ -253,7 +253,7 @@ else
 
         numOfTourOverlap = await http.GetFromJsonAsync<int>($"/api/bookings/tour/overlap?start={newBooking.TourStartDate}&end={newBooking.TourEndDate}&tourId={selectedTour.Id}");
 
-        if ((selectedTour.MaxNumberOfGuests < numOfTourOverlap + newBooking.NumberOfPeopleOnTour) & (numOfHotelOverlap > 20))
+        if ((selectedTour.MaxNumberOfGuests < numOfTourOverlap + newBooking.NumberOfPeopleOnTour) && (numOfHotelOverlap > 20))
         {
             showHotelOverlap = true;
             showTourOverlap = true;
