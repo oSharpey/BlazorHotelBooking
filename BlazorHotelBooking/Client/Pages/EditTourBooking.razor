@@ -21,8 +21,8 @@
     </div>
    
     @{
-        var currentDeposit = selectedBooking.DepositAmountPaid;
-        var surcharge = (double)currentDeposit * 0.05;
+        var total = selectedBooking.TotalPrice;
+        var surcharge = (double)total * 0.05;
     
         <p>Modifying this booking will also incure a 5% surcharge (£@surcharge)</p>
 

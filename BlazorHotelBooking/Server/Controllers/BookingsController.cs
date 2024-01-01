@@ -126,12 +126,21 @@ namespace BlazorHotelBooking.Server.Controllers
         [HttpGet("hotel/overlap")]
         public ActionResult<int> CheckIfBookingOverlaps(DateTime checkIn, DateTime checkOut, int hotelId, string roomType)
         {
-            var overlap =  _context.HotelBookings.Where(x => 
+            var hotelOverlap =  _context.HotelBookings.Where(x => 
                 x.CheckIn <= checkOut && 
                 x.CheckOut >= checkIn && 
                 x.RoomType == roomType &&
                 x.HotelId == hotelId
             ).ToList().Count();
+
+            var packageOverlap = _context.PackageBookings.Where(x =>
+                x.HotelCheckIn <= checkOut &&
+                x.HotelCheckOut >= checkIn &&
+                x.RoomType == roomType &&
+                x.HotelId == hotelId
+            ).ToList().Count();
+
+            var overlap = hotelOverlap + packageOverlap;
 
             return Ok(overlap);
         }
@@ -268,16 +277,29 @@ namespace BlazorHotelBooking.Server.Controllers
         public ActionResult<int> CheckIfTourBookingOverlaps(DateTime start, DateTime end, int tourId)
         {
             int guestCount = 0;
-            var overlap = _context.TourBookings.Where(x =>
+            var tourOverlap = _context.TourBookings.Where(x =>
                 x.CommencementDate <= end &&
                 x.EndDate >= start &&
                 x.TourId == tourId
             ).ToList();
 
-            foreach(var item in overlap)
+            var packageOverlap = _context.PackageBookings.Where(x =>
+                x.TourStartDate <= end &&
+                x.TourEndDate >= start &&
+                x.TourId == tourId
+            ).ToList();
+
+
+            foreach(var item in tourOverlap)
             {
                 guestCount += item.NumberOfPeople;
             }
+
+            foreach (var item in packageOverlap)
+            {
+                guestCount += item.NumberOfPeopleOnTour;
+            }
+
            
             return Ok(guestCount);
         }
@@ -312,6 +334,147 @@ namespace BlazorHotelBooking.Server.Controllers
             await _context.SaveChangesAsync();
 
             return Ok("Booking Successful");
+        }
+
+
+
+        // Bookings for Packages
+
+        [HttpPost("package/book")]
+        public async Task<ActionResult<string>> AddPackageBooking(PackageBooking pkg)
+        {
+            _context.PackageBookings.Add(pkg);
+            await _context.SaveChangesAsync();
+
+            return Ok("Booking Successful");
+        }
+
+        [HttpGet("package/userbooking")]
+        public async Task<ActionResult<List<TourBookingViewModel>>> GetAllPackageBookingsWithUserId(string userId)
+        {
+            var query = from booking in _context.PackageBookings
+                        join tour in _context.Tours on booking.TourId equals tour.Id
+                        join hotel in _context.Hotels on booking.HotelId equals hotel.Id
+                        where booking.UserId == userId
+                        select new PackageBookingViewModel
+                        {
+                            bookingId = booking.Id,
+                            TourName = tour.Name,
+                            CommencementDate = booking.TourStartDate,
+                            EndDate = booking.TourEndDate,
+                            NumberOfGuests = booking.NumberOfPeopleOnTour,
+                            hotelName = hotel.Name,
+                            RoomType = booking.RoomType,
+                            CheckIn = booking.HotelCheckIn,
+                            CheckOut = booking.HotelCheckOut,
+                            NumberOfNights = booking.NumberOfNights,
+                            TotalPrice = booking.TotalPrice,
+                            DepositAmountPaid = booking.DepositAmountPaid,
+                            BookingDate = booking.BookingDate,
+                            paidInfull = booking.PaidInfull,
+                            IsCancelled = booking.IsCancelled,
+                            PaymentDueDate = booking.PaymentDueDate
+                        };
+            var result = await query.ToListAsync();
+
+            return Ok(result);
+        }
+
+        [HttpPut("package/payment/{id}")]
+        public async Task<ActionResult<string>> PayPackageRemainder(string id)
+        {
+            var dbPackage = await _context.PackageBookings.FindAsync(id);
+
+            if (dbPackage == null)
+            {
+                return NotFound("This bookings does not exist");
+            }
+
+            if (dbPackage.PaidInfull == true)
+            {
+                return BadRequest("You have already paid in full");
+            }
+
+            dbPackage.DepositAmountPaid = dbPackage.TotalPrice;
+            dbPackage.PaidInfull = true;
+
+            _context.PackageBookings.Update(dbPackage);
+            await _context.SaveChangesAsync();
+
+            return Ok("Payment Successful");
+        }
+
+
+        [HttpPut("package/{id}")]
+        public async Task<ActionResult<string>> UpdatePackage(string id, PackageBooking pkg)
+        {
+            var dbPackage = await _context.PackageBookings.FindAsync(id);
+
+            if (dbPackage == null)
+            {
+                return NotFound("This Package Booking does not exist");
+            }
+
+            dbPackage.Id = pkg.Id;
+            dbPackage.TourId = pkg.TourId;
+            dbPackage.TourStartDate = pkg.TourStartDate;
+            dbPackage.TourEndDate = pkg.TourEndDate;
+            dbPackage.NumberOfPeopleOnTour = pkg.NumberOfPeopleOnTour;
+            dbPackage.HotelId = pkg.HotelId;
+            dbPackage.RoomType = pkg.RoomType;
+            dbPackage.HotelCheckIn = pkg.HotelCheckIn;
+            dbPackage.HotelCheckOut = pkg.HotelCheckOut;
+            dbPackage.NumberOfNights = pkg.NumberOfNights;
+            dbPackage.TotalPrice = pkg.TotalPrice;
+            dbPackage.DepositAmountPaid = pkg.DepositAmountPaid;
+            dbPackage.BookingDate = pkg.BookingDate;
+            dbPackage.UserId = pkg.UserId;
+            dbPackage.PaidInfull = pkg.PaidInfull;
+            dbPackage.IsCancelled = pkg.IsCancelled;
+            dbPackage.PaymentDueDate = pkg.PaymentDueDate;
+
+            _context.PackageBookings.Update(dbPackage);
+            await _context.SaveChangesAsync();
+
+            return Ok("Booking Updated Successfuly");
+        }
+
+
+        [HttpGet("package/{id}")]
+        public async Task<ActionResult<TourBooking>> GetPackageBookingById(string id)
+        {
+            var dbPackage = await _context.PackageBookings.FindAsync(id);
+
+            if (dbPackage == null)
+            {
+                return NotFound("This booking does not exist");
+            }
+
+            return Ok(dbPackage);
+        }
+
+        [HttpDelete("package/{id}")]
+        public async Task<ActionResult<string>> DeletePackageBooking(string id)
+        {
+            var dbPackage = await _context.PackageBookings.FindAsync(id);
+            var today = DateTime.Now;
+            var tourdatediff = dbPackage.TourStartDate - today;
+            var hoteldatediff = dbPackage.HotelCheckIn - today;
+
+            if (dbPackage == null)
+            {
+                return NotFound("This tour booking does not exist");
+            }
+
+            if (tourdatediff.Days < 5 || hoteldatediff.Days < 5)
+            {
+                return BadRequest("You cannot cancel this booking");
+            }
+
+            _context.PackageBookings.Remove(dbPackage);
+            await _context.SaveChangesAsync();
+
+            return Ok("Booking Deleted");
         }
     }
 }
