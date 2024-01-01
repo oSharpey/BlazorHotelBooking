@@ -8,6 +8,18 @@
 
 <input @oninput="Search" placeholder="Search..." class="p-3" />
 
+<br />
+<br />
+<EditForm Model="startDate" OnSubmit="DateSearch">
+    <div class="form-group">
+        <label class="control-label">Start Date</label>
+        <InputDate @bind-Value="startDate" min="@min" max="@max" Placeholder="Enter Date" />
+        <label class="control-label">Number Of People</label>
+        <InputNumber @bind-Value="numOfPeople" Placeholder="Number of People" />
+    </div>
+    <button type="button" class="btn btn-success" @onclick="DateSearch">Search</button>
+</EditForm>
+
 
 @if (tours.Count <= 0)
 {
@@ -34,9 +46,20 @@ else
 
 @code {
     List<Tour> tours = new List<Tour>();
+    private DateTime startDate = DateTime.Now.Date.AddMonths(2);
+    private DateTime endDate;
+    private int numOfOverlap;
+    private int numOfPeople;
+    private string min;
+    private string max;
+
 
     protected override async Task OnInitializedAsync()
     {
+
+        min = DateOnly.FromDateTime(DateTime.Now.Date.AddMonths(2)).ToString("yyyy-MM-dd");
+        max = DateOnly.FromDateTime(DateTime.Now.Date.AddYears(5)).ToString("yyyy-MM-dd");
+
         var result = await http.GetFromJsonAsync<List<Tour>>("/api/tour");
         if (result != null)
         {
@@ -47,13 +70,37 @@ else
     private async void Search(ChangeEventArgs args)
     {
         var searchTerm = (string)args.Value;
-       
+
         var result = await http.GetFromJsonAsync<List<Tour>>("/api/tour");
         // make it case insensitive to search hotels
 
         tours = result.Where(x => x.Name.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
                .OrderByDescending(x => x.Id)
                .ToList();
+
+        StateHasChanged();
+    }
+
+    private async void DateSearch()
+    {
+        var result = await http.GetFromJsonAsync<List<Tour>>("/api/tour");
+        var tempList = new List<Tour>();
+
+        if (result != null)
+        {
+            foreach (var tour in result.ToList())
+            {
+                endDate = startDate.AddDays(tour.DurationInDays);
+                numOfOverlap = await http.GetFromJsonAsync<int>($"/api/bookings/tour/overlap?start={startDate}&end={endDate}&tourId={tour.Id}");
+
+                if (!(tour.MaxNumberOfGuests < numOfOverlap + numOfPeople))
+                {
+                    tempList.Add(tour);
+                }
+            }
+
+            tours = tempList;
+        }
 
         StateHasChanged();
     }

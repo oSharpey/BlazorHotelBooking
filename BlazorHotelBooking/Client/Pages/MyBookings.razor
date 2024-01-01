@@ -527,7 +527,7 @@ else
     private void PayHotelRemainder(string id, decimal remainder)
     {
         var result = http.PutAsync($"api/bookings/hotel/payment/{id}?paymentRemainder={remainder}", null);
-        NavigationManager.NavigateTo("/mybookings", true);
+        StateHasChanged();
     }
 
     private void ClosePopup()
@@ -539,7 +539,7 @@ else
     async Task CancelTourBooking(string id)
     {
         var result = await http.DeleteAsync($"api/bookings/tour/{id}");
-        NavigationManager.NavigateTo("/mybookings", true);
+        StateHasChanged();
     }
 
     private void ModifyTourBooking(string id)
@@ -558,13 +558,13 @@ else
     private void PayTourRemainder(string id)
     {
         var result = http.PutAsync($"api/bookings/tour/payment/{id}", null);
-        NavigationManager.NavigateTo("/mybookings", true);
+        StateHasChanged();
     }
 
     async Task CancelPackageBooking(string id)
     {
         var result = await http.DeleteAsync($"api/bookings/package/{id}");
-        NavigationManager.NavigateTo("/mybookings", true);
+        StateHasChanged();
     }
 
     private void ModifyPackageBooking(string id)
@@ -583,7 +583,7 @@ else
     private void PayPackageRemainder(string id)
     {
         var result = http.PutAsync($"api/bookings/package/payment/{id}", null);
-        NavigationManager.NavigateTo("/mybookings", true);
+        StateHasChanged();
     }
 
 

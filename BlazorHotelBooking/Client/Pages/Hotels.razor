@@ -8,6 +8,18 @@
 
 <input @oninput="Search" placeholder="Search..." class="p-3" />
 
+<br />
+<br />
+<EditForm Model="checkin" OnSubmit="DateSearch">
+    <div class="form-group">
+        <label class="control-label">Check-In Date</label>
+        <InputDate @bind-Value="checkin" min="@min" max="@max" Placeholder="Enter Date" />
+        <label class="control-label">Number Of Nights</label>
+        <InputNumber @bind-Value="numofnights" Placeholder="Number of Nights" />
+    </div>
+    <button type="button" class="btn btn-success" @onclick="DateSearch">Search</button>
+</EditForm>
+
 
 @if (hotels.Count <= 0)
 {
@@ -41,9 +53,20 @@ else
 
 @code {
     List<Hotel> hotels = new List<Hotel>();
+    DateTime checkin = DateTime.Now.Date.AddMonths(2);
+    DateTime checkout;
+    private int numofnights;
+    private string min;
+    private string max;
+    private int numSingleOver, numDoubleOver, numFamilyOver;
+
 
     protected override async Task OnInitializedAsync()
     {
+
+        min = DateOnly.FromDateTime(DateTime.Now.Date.AddMonths(2)).ToString("yyyy-MM-dd");
+        max = DateOnly.FromDateTime(DateTime.Now.Date.AddYears(5)).ToString("yyyy-MM-dd");
+
         var result = await http.GetFromJsonAsync<List<Hotel>>("/api/hotel");
         if (result != null)
         {
@@ -54,7 +77,7 @@ else
     private async void Search(ChangeEventArgs args)
     {
         var searchTerm = (string)args.Value;
-       
+
         var result = await http.GetFromJsonAsync<List<Hotel>>("/api/hotel");
         // make it case insensitive to search hotels
 
@@ -62,6 +85,32 @@ else
                .OrderByDescending(x => x.Id)
                .ToList();
 
+        StateHasChanged();
+    }
+
+
+    private async void DateSearch()
+    {
+        var result = await http.GetFromJsonAsync<List<Hotel>>("/api/hotel");
+        var tempList = new List<Hotel>();
+        checkout = checkin.AddDays(numofnights);
+
+        if (result != null)
+        {
+            foreach (var hotel in result)
+            {
+                numSingleOver = await http.GetFromJsonAsync<int>($"/api/bookings/hotel/overlap?checkIn={checkin}&checkOut={checkout}&hotelId={hotel.Id}&roomType=Single");
+                numDoubleOver = await http.GetFromJsonAsync<int>($"/api/bookings/hotel/overlap?checkIn={checkin}&checkOut={checkout}&hotelId={hotel.Id}&roomType=Double");
+                numFamilyOver = await http.GetFromJsonAsync<int>($"/api/bookings/hotel/overlap?checkIn={checkin}&checkOut={checkout}&hotelId={hotel.Id}&roomType=Family");
+
+                if (!(numSingleOver > 20 && numDoubleOver > 20 && numFamilyOver > 20))
+                {
+                    tempList.Add(hotel);
+                }
+            }
+
+            hotels = tempList;
+        }
         StateHasChanged();
     }
 
