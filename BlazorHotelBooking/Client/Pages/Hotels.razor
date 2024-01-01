@@ -92,6 +92,7 @@ else
     private async void DateSearch()
     {
         var result = await http.GetFromJsonAsync<List<Hotel>>("/api/hotel");
+        var tempList = new List<Hotel>();
         checkout = checkin.AddDays(numofnights);
 
         if (result != null)
@@ -102,13 +103,13 @@ else
                 numDoubleOver = await http.GetFromJsonAsync<int>($"/api/bookings/hotel/overlap?checkIn={checkin}&checkOut={checkout}&hotelId={hotel.Id}&roomType=Double");
                 numFamilyOver = await http.GetFromJsonAsync<int>($"/api/bookings/hotel/overlap?checkIn={checkin}&checkOut={checkout}&hotelId={hotel.Id}&roomType=Family");
 
-                if (numSingleOver > 20 && numDoubleOver > 20 && numFamilyOver > 20)
+                if (!(numSingleOver > 20 && numDoubleOver > 20 && numFamilyOver > 20))
                 {
-                    result.Remove(hotel);
+                    tempList.Add(hotel);
                 }
             }
 
-            hotels = result;
+            hotels = tempList;
         }
         StateHasChanged();
     }
