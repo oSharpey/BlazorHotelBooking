@@ -171,6 +171,30 @@ namespace BlazorHotelBooking.Server.Controllers
 
             return await GetAllTours();
         }
+
+        // create 3 methods to get all bookings for each type of booking
+
+        [HttpGet("hotelbooking")]
+        public async Task<ActionResult<List<HotelBooking>>> GetAllHotelBookings()
+        {
+            var list = await _context.HotelBookings.ToListAsync();
+
+            return Ok(list);
+        }
+        [HttpGet("tourbooking")]
+        public async Task<ActionResult<List<TourBooking>>> GetAllTourBookings()
+        {
+            var list = await _context.TourBookings.ToListAsync();
+
+            return Ok(list);
+        }
+        [HttpGet("packagebooking")]
+        public async Task<ActionResult<List<PackageBooking>>> GetAllPackageBookings()
+        {
+            var list = await _context.PackageBookings.ToListAsync();
+
+            return Ok(list);
+        }
     }
 }
 
