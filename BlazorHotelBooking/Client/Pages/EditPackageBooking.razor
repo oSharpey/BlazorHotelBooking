@@ -7,7 +7,7 @@
 
 
 <PageTitle> Edit Booking </PageTitle>
-<h4>Editing booking for @hotel.Name on @selectedBooking.CheckIn.ToString("dd/MM/yyyy")</h4>
+<h7>Editing booking for @hotel.Name on @selectedBooking.HotelCheckIn.ToString("dd/MM/yyyy") & @tour.Name on @selectedBooking.TourStartDate</h7>
 
 
 <EditForm Model="selectedBooking" OnSubmit="HandleSubmit">
@@ -29,27 +29,45 @@
         <label for="NumOfNights">Number Of Nights</label>
         <InputNumber id="NumOfNights" @bind-Value="selectedBooking.NumberOfNights" class="form-control" />
     </div>
+    <br/>
+    <br/>
+    <div>
+        <label for="TourName">Tour</label>
+        <InputText id="TourName" @bind-Value="tour.Name" class="form-control" disabled="true" />
+    </div>
+    <div>
+        <label for="NumOfPeople">Number Of Guests</label>
+        <InputNumber id="NumOfPeople" @bind-Value="selectedBooking.NumberOfPeopleOnTour" class="form-control" />
+    </div>
+
+
+
+
+
     @{
         var currentDeposit = selectedBooking.DepositAmountPaid;
         decimal currentTotal = selectedBooking.TotalPrice;
-        var currentCheckOut = selectedBooking.CheckOut;
+        var currentCheckOut = selectedBooking.HotelCheckOut;
 
         switch (selectedBooking.RoomType)
         {
             case "Single":
-                newTotal = hotel.SBPrice * selectedBooking.NumberOfNights;
+                newTotal = (hotel.SBPrice * selectedBooking.NumberOfNights) + tour.Cost;
+                newTotal = newTotal * (decimal)0.9;
                 newDeposit = newTotal / 5;
-                newCheckOut = selectedBooking.CheckIn.AddDays(selectedBooking.NumberOfNights);
+                newCheckOut = selectedBooking.HotelCheckIn.AddDays(selectedBooking.NumberOfNights);
                 break;
             case "Double":
-                newTotal = hotel.DBPrice * selectedBooking.NumberOfNights;
+                newTotal = (hotel.DBPrice * selectedBooking.NumberOfNights) + tour.Cost;
+                newTotal = newTotal * (decimal)0.8;
                 newDeposit = newTotal / 5;
-                newCheckOut = selectedBooking.CheckIn.AddDays(selectedBooking.NumberOfNights);
+                newCheckOut = selectedBooking.HotelCheckIn.AddDays(selectedBooking.NumberOfNights);
                 break;
             case "Family":
-                newTotal = hotel.FamPrice * selectedBooking.NumberOfNights;
+                newTotal = (hotel.FamPrice * selectedBooking.NumberOfNights) + tour.Cost;
+                newTotal = newTotal * (decimal)0.6;
                 newDeposit = newTotal / 5;
-                newCheckOut = selectedBooking.CheckIn.AddDays(selectedBooking.NumberOfNights);
+                newCheckOut = selectedBooking.HotelCheckIn.AddDays(selectedBooking.NumberOfNights);
                 break;
         }
 
@@ -101,10 +119,17 @@
 
         <p>Modifying this booking will also incure a 5% surcharge (£@surcharge)</p>
 
-        if (showOverlap)
+        if (showHotelOverlap)
         {
             <div class="alert alert-danger" role="alert">
                 <p>There are no more spaces for this room on these dates please select new dates.</p>
+            </div>
+        }
+
+        if (showTourOverlap)
+        {
+            <div class="alert alert-danger" role="alert">
+                <p>There are no more spaces left in this tour for that many people on these dates please select new dates or less people.</p>
             </div>
         }
     }
@@ -116,20 +141,21 @@
     [Parameter]
     public string? Id { get; set; }
 
-    private HotelBooking selectedBooking = new HotelBooking();
+    private PackageBooking selectedBooking = new PackageBooking();
     private Hotel hotel = new Hotel();
+    private Tour tour = new Tour();
     List<string> roomType = new List<string>() { "Single", "Double", "Family" };
     private int currentNights;
     private decimal newTotal, newDeposit;
     private DateTime newCheckOut;
-    private bool showOverlap = false;
-    private int numOfOverlap;
+    private int numOfTourOverlap, numOfHotelOverlap;
+    private bool showHotelOverlap, showTourOverlap = false;
 
     protected override async Task OnParametersSetAsync()
     {
         if (Id is not null)
         {
-            var result = await http.GetFromJsonAsync<HotelBooking>($"api/bookings/hotel/{Id}");
+            var result = await http.GetFromJsonAsync<PackageBooking>($"api/bookings/package/{Id}");
             if (result is not null)
             {
                 selectedBooking = result;
@@ -139,6 +165,7 @@
         currentNights = selectedBooking.NumberOfNights;
 
         hotel = await http.GetFromJsonAsync<Hotel>($"api/hotel/{selectedBooking.HotelId}");
+        tour = await http.GetFromJsonAsync<Tour>($"api/tour/{selectedBooking.TourId}");
     }
 
     async Task HandleSubmit()
@@ -155,17 +182,20 @@
             selectedBooking.TotalPrice = newTotal;
         }
         
-        selectedBooking.CheckOut = newCheckOut;
+        selectedBooking.HotelCheckOut = newCheckOut;
 
-        numOfOverlap = await http.GetFromJsonAsync<int>($"/api/bookings/hotel/overlap?checkIn={selectedBooking.CheckIn}&checkOut={selectedBooking.CheckOut}&hotelId={selectedBooking.HotelId}&roomType={selectedBooking.RoomType}");
+        numOfHotelOverlap = await http.GetFromJsonAsync<int>($"/api/bookings/hotel/overlap?checkIn={selectedBooking.HotelCheckIn}&checkOut={selectedBooking.HotelCheckOut}&hotelId={hotel.Id}&roomType={selectedBooking.RoomType}");
 
-        if (numOfOverlap > 20)
+        numOfTourOverlap = await http.GetFromJsonAsync<int>($"/api/bookings/tour/overlap?start={selectedBooking.TourStartDate}&end={selectedBooking.TourEndDate}&tourId={tour.Id}");
+
+        if ((tour.MaxNumberOfGuests < numOfTourOverlap + selectedBooking.NumberOfPeopleOnTour) & (numOfHotelOverlap > 20))
         {
-            showOverlap = true;
+            showHotelOverlap = true;
+            showTourOverlap = true;
         }
         else
         {
-            await http.PutAsJsonAsync($"api/bookings/hotel/{Id}", selectedBooking);
+            await http.PutAsJsonAsync($"api/bookings/package/{Id}", selectedBooking);
             NavigationManager.NavigateTo("/mybookings");
         }
     }
