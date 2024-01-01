@@ -1,0 +1,178 @@
+﻿@page "/editbooking/package/{id}"
+@using BlazorHotelBooking.Shared
+@using Microsoft.AspNetCore.Authorization
+@inject HttpClient http
+@inject NavigationManager NavigationManager
+@attribute [Authorize]
+
+
+<PageTitle> Edit Booking </PageTitle>
+<h4>Editing booking for @hotel.Name on @selectedBooking.CheckIn.ToString("dd/MM/yyyy")</h4>
+
+
+<EditForm Model="selectedBooking" OnSubmit="HandleSubmit">
+    <div>
+        <label for="HotelName">Hotel</label>
+        <InputText id="HotelName" @bind-Value="hotel.Name" class="form-control" disabled="true" />
+    </div>
+    <div>
+        <label for="RoomType">Room Type</label>
+        <InputSelect id="roomType" @bind-Value="selectedBooking.RoomType" placeholder="Room Type">
+            <option value="">---</option>
+            @foreach (var room in roomType)
+            {
+                <option value="@room">@room</option>
+            }
+        </InputSelect>
+    </div>
+    <div>
+        <label for="NumOfNights">Number Of Nights</label>
+        <InputNumber id="NumOfNights" @bind-Value="selectedBooking.NumberOfNights" class="form-control" />
+    </div>
+    @{
+        var currentDeposit = selectedBooking.DepositAmountPaid;
+        decimal currentTotal = selectedBooking.TotalPrice;
+        var currentCheckOut = selectedBooking.CheckOut;
+
+        switch (selectedBooking.RoomType)
+        {
+            case "Single":
+                newTotal = hotel.SBPrice * selectedBooking.NumberOfNights;
+                newDeposit = newTotal / 5;
+                newCheckOut = selectedBooking.CheckIn.AddDays(selectedBooking.NumberOfNights);
+                break;
+            case "Double":
+                newTotal = hotel.DBPrice * selectedBooking.NumberOfNights;
+                newDeposit = newTotal / 5;
+                newCheckOut = selectedBooking.CheckIn.AddDays(selectedBooking.NumberOfNights);
+                break;
+            case "Family":
+                newTotal = hotel.FamPrice * selectedBooking.NumberOfNights;
+                newDeposit = newTotal / 5;
+                newCheckOut = selectedBooking.CheckIn.AddDays(selectedBooking.NumberOfNights);
+                break;
+        }
+
+
+        if(selectedBooking.PaidInfull)
+        {
+            if (newTotal > currentTotal)
+            {
+                var totalDiference = newTotal - currentTotal;
+                <div>
+                    <p>The new total for this booking is £@newTotal</p>
+                    <p>You will need to pay £@totalDiference more to complete this booking</p>
+                </div>
+            }
+            else if (newTotal < currentTotal)
+            {
+                var totalDiference = currentTotal - newTotal;
+                <div>
+                    <p>The new total for this booking is £@newTotal</p>
+                    <p>You will be refunded £@totalDiference</p>
+                </div>
+            }
+        }
+        else
+        {
+            if (newTotal > currentTotal)
+            {
+                var depositDiference = newDeposit - currentDeposit;
+                <div>
+                    <p>The new total for this booking is £@newTotal</p>
+                    <p>The new deposit for this booking is £@newDeposit</p>
+                    <p>You will need to pay £@depositDiference more to complete this booking</p>
+                </div>
+
+            }
+            else if (newTotal < currentTotal)
+            {
+                var depositDiference = currentDeposit - newDeposit;
+                <div>
+                    <p>The new total for this booking is £@newTotal</p>
+                    <p>The new deposit for this booking is £@newDeposit</p>
+                    <p>You will be refunded £@depositDiference</p>
+                </div>
+
+            }
+        }
+
+        var surcharge = (double)newTotal * 0.05;
+
+        <p>Modifying this booking will also incure a 5% surcharge (£@surcharge)</p>
+
+        if (showOverlap)
+        {
+            <div class="alert alert-danger" role="alert">
+                <p>There are no more spaces for this room on these dates please select new dates.</p>
+            </div>
+        }
+    }
+    <button type="submit" class="btn btn-primary">Save</button>
+</EditForm> 
+
+
+@code {
+    [Parameter]
+    public string? Id { get; set; }
+
+    private HotelBooking selectedBooking = new HotelBooking();
+    private Hotel hotel = new Hotel();
+    List<string> roomType = new List<string>() { "Single", "Double", "Family" };
+    private int currentNights;
+    private decimal newTotal, newDeposit;
+    private DateTime newCheckOut;
+    private bool showOverlap = false;
+    private int numOfOverlap;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id is not null)
+        {
+            var result = await http.GetFromJsonAsync<HotelBooking>($"api/bookings/hotel/{Id}");
+            if (result is not null)
+            {
+                selectedBooking = result;
+            }
+        }
+
+        currentNights = selectedBooking.NumberOfNights;
+
+        hotel = await http.GetFromJsonAsync<Hotel>($"api/hotel/{selectedBooking.HotelId}");
+    }
+
+    async Task HandleSubmit()
+    {
+
+        if (selectedBooking.PaidInfull)
+        {
+            selectedBooking.DepositAmountPaid = newTotal;
+            selectedBooking.TotalPrice = newTotal;
+        }
+        else
+        {
+            selectedBooking.DepositAmountPaid = newDeposit;
+            selectedBooking.TotalPrice = newTotal;
+        }
+        
+        selectedBooking.CheckOut = newCheckOut;
+
+        numOfOverlap = await http.GetFromJsonAsync<int>($"/api/bookings/hotel/overlap?checkIn={selectedBooking.CheckIn}&checkOut={selectedBooking.CheckOut}&hotelId={selectedBooking.HotelId}&roomType={selectedBooking.RoomType}");
+
+        if (numOfOverlap > 20)
+        {
+            showOverlap = true;
+        }
+        else
+        {
+            await http.PutAsJsonAsync($"api/bookings/hotel/{Id}", selectedBooking);
+            NavigationManager.NavigateTo("/mybookings");
+        }
+    }
+
+
+
+       
+
+    
+}
