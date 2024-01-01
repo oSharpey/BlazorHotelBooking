@@ -31,9 +31,10 @@ else
                     <th>Check In Date</th>
                     <th>Check Out Date</th>
                     <th>Number of Nights</th>
-                    <th>Amount Paid so Far</th>
+                    <th>Deposit</th>
                     <th>Total Cost</th>
                     <th>Payment Due Date</th>
+                    <th>Paid in full?</th>
                 </tr>
 
             </thead>
@@ -69,6 +70,7 @@ else
                             <td width="5%">£@h.DepositAmountPaid</td>
                             <td width="5%">£@h.TotalPrice</td>
                             <td width="5%">@h.PaymentDueDate</td>
+                            <td width="5%">@h.paidInfull</td>
                             <td width="5%">
                                 <button class="btn btn-primary" disabled="@disableModify" @onclick="() => ModifyHotelBooking(h.bookingId)">Modify</button>
                             </td>
@@ -131,7 +133,7 @@ else
             <div class="popupCreate">
                 <h3>Pay Remainder</h3>
                 <p>Are you sure you want to pay the remainder of this hotel booking? It will cost you £@remainder </p>
-                <button class="btn btn-success" @onclick="() => PayHotelRemainder(bookingId)">Yes</button>
+                <button class="btn btn-success" @onclick="() => PayHotelRemainder(bookingId, remainder)">Yes</button>
                 <button class="btn btn-danger" @onclick="ClosePopup">No</button>
             </div>
         </div>
@@ -518,9 +520,9 @@ else
         totalToPay = total;
     }
 
-    private void PayHotelRemainder(string id)
+    private void PayHotelRemainder(string id, decimal remainder)
     {
-        var result = http.PutAsync($"api/bookings/hotel/payment/{id}", null);
+        var result = http.PutAsync($"api/bookings/hotel/payment/{id}?paymentRemainder={remainder}", null);
         NavigationManager.NavigateTo("/mybookings", true);
     }
 

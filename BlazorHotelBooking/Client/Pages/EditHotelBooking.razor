@@ -58,18 +58,19 @@
         {
             if (newTotal > currentTotal)
             {
-                var totalDiference = newTotal - currentTotal;
+                difference = newTotal - currentTotal;
                 <div>
                     <p>The new total for this booking is £@newTotal</p>
-                    <p>You will need to pay £@totalDiference more to complete this booking</p>
+                    <p>You will need to pay £@difference more to complete this booking</p>
                 </div>
             }
             else if (newTotal < currentTotal)
             {
-                var totalDiference = currentTotal - newTotal;
+                var refund = currentTotal - newTotal;
+                difference = refund * -1;
                 <div>
                     <p>The new total for this booking is £@newTotal</p>
-                    <p>You will be refunded £@totalDiference</p>
+                    <p>You will be refunded £@refund</p>
                 </div>
             }
         }
@@ -77,27 +78,28 @@
         {
             if (newTotal > currentTotal)
             {
-                var depositDiference = newDeposit - currentDeposit;
+                difference = newDeposit - currentDeposit;
                 <div>
                     <p>The new total for this booking is £@newTotal</p>
                     <p>The new deposit for this booking is £@newDeposit</p>
-                    <p>You will need to pay £@depositDiference more to complete this booking</p>
+                    <p>You will need to pay £@difference more to complete this booking</p>
                 </div>
 
             }
             else if (newTotal < currentTotal)
             {
-                var depositDiference = currentDeposit - newDeposit;
+                var refund = currentDeposit - newDeposit;
+                difference = refund * -1;
                 <div>
                     <p>The new total for this booking is £@newTotal</p>
                     <p>The new deposit for this booking is £@newDeposit</p>
-                    <p>You will be refunded £@depositDiference</p>
+                    <p>You will be refunded £@refund</p>
                 </div>
 
             }
         }
 
-        var surcharge = (double)newTotal * 0.05;
+        surcharge = newTotal * (decimal)0.05;
 
         <p>Modifying this booking will also incure a 5% surcharge (£@surcharge)</p>
 
@@ -124,6 +126,8 @@
     private DateTime newCheckOut;
     private bool showOverlap = false;
     private int numOfOverlap;
+    private decimal difference;
+    private decimal surcharge;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -146,7 +150,7 @@
 
         if (selectedBooking.PaidInfull)
         {
-            selectedBooking.DepositAmountPaid = newTotal;
+            selectedBooking.DepositAmountPaid = newDeposit;
             selectedBooking.TotalPrice = newTotal;
         }
         else
@@ -165,7 +169,7 @@
         }
         else
         {
-            await http.PutAsJsonAsync($"api/bookings/hotel/{Id}", selectedBooking);
+            await http.PutAsJsonAsync($"api/bookings/hotel/{Id}?paymentRemainder={difference}&surcharge={surcharge}", selectedBooking);
             NavigationManager.NavigateTo("/mybookings");
         }
     }

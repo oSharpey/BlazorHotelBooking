@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 
 
 namespace BlazorHotelBooking.Server.Controllers
@@ -55,6 +56,7 @@ namespace BlazorHotelBooking.Server.Controllers
         public async Task<ActionResult<string>> PayHotelRemainder(string id)
         {
             var dbHotel = await _context.HotelBookings.FindAsync(id);
+            var payment = new Payments();
 
             if (dbHotel == null)
             {
@@ -66,8 +68,17 @@ namespace BlazorHotelBooking.Server.Controllers
                 return BadRequest("You have already paid in full");
             }
 
-            dbHotel.DepositAmountPaid = dbHotel.TotalPrice;
+            //dbHotel.DepositAmountPaid = dbHotel.TotalPrice;
             dbHotel.PaidInfull = true;
+
+            payment.UserId = dbHotel.UserId;
+            payment.bookingId = dbHotel.Id;
+            payment.bookingType = "Hotel";
+            payment.AmountPaid = dbHotel.TotalPrice - dbHotel.DepositAmountPaid;
+            payment.paymentType = "PayRemainder";
+
+            _context.Payments.Add(payment);
+
 
             _context.HotelBookings.Update(dbHotel);
             await _context.SaveChangesAsync();
@@ -77,9 +88,11 @@ namespace BlazorHotelBooking.Server.Controllers
 
 
         [HttpPut("hotel/{id}")]
-        public async Task<ActionResult<string>> UpdateHotel(string id, HotelBooking hotl)
+        public async Task<ActionResult<string>> UpdateHotel(string id, HotelBooking hotl, decimal paymentRemainder, decimal surcharge)
         {
             var dbHotel = await _context.HotelBookings.FindAsync(id);
+            var payment = new Payments();
+            var payment2 = new Payments();
 
             if (dbHotel == null)
             {
@@ -99,6 +112,22 @@ namespace BlazorHotelBooking.Server.Controllers
             dbHotel.PaidInfull = hotl.PaidInfull;
             dbHotel.IsCancelled = hotl.IsCancelled;
             dbHotel.PaymentDueDate = hotl.PaymentDueDate;
+
+
+            payment.UserId = dbHotel.UserId;
+            payment.bookingId = dbHotel.Id;
+            payment.bookingType = "Hotel";
+            payment.AmountPaid = paymentRemainder;
+            payment.paymentType = "ModifyBooking";
+
+            payment2.UserId = dbHotel.UserId;
+            payment2.bookingId = dbHotel.Id;
+            payment2.bookingType = "Hotel";
+            payment2.AmountPaid = surcharge;
+            payment2.paymentType = "Surcharge";
+
+            _context.Payments.Add(payment2);
+            _context.Payments.Add(payment);
 
             _context.HotelBookings.Update(dbHotel);
             await _context.SaveChangesAsync();
@@ -149,6 +178,7 @@ namespace BlazorHotelBooking.Server.Controllers
         public async Task<ActionResult<List<Hotel>>> DeleteHotelBooking(string id)
         {
             var dbHotel = await _context.HotelBookings.FindAsync(id);
+            var payment = new Payments();
             var today = DateTime.Now;
             var datediff = dbHotel.CheckIn - today;
 
@@ -161,7 +191,25 @@ namespace BlazorHotelBooking.Server.Controllers
             {
                 return BadRequest("You cannot cancel this booking");
             }
-           
+
+            payment.UserId = dbHotel.UserId;
+            payment.bookingId = dbHotel.Id;
+            payment.bookingType = "Hotel";
+
+            if (dbHotel.PaidInfull == true)
+            {
+                payment.AmountPaid = dbHotel.TotalPrice * -1;
+            }
+            else
+            {
+                payment.AmountPaid = dbHotel.DepositAmountPaid * -1;
+            }
+
+            payment.AmountPaid = dbHotel.DepositAmountPaid * -1;
+            payment.paymentType = "Refund";
+
+            _context.Payments.Add(payment);
+
             _context.HotelBookings.Remove(dbHotel);
             await _context.SaveChangesAsync();
 
@@ -171,6 +219,16 @@ namespace BlazorHotelBooking.Server.Controllers
         [HttpPost("hotel/book")]
         public async Task<ActionResult<List<HotelBooking>>> AddHotelBooking(HotelBooking hotl)
         {
+
+            Payments payment = new Payments();
+            payment.UserId = hotl.UserId;
+            payment.bookingId = hotl.Id;
+            payment.bookingType = "Hotel";
+            payment.AmountPaid = hotl.DepositAmountPaid;
+            payment.paymentType = "Deposit";
+
+            _context.Payments.Add(payment);
+
             _context.HotelBookings.Add(hotl);
             await _context.SaveChangesAsync();
 
