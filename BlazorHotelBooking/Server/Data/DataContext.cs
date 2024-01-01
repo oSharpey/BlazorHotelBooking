@@ -16,6 +16,7 @@ namespace BlazorHotelBooking.Server.Data
         public DbSet<TourBooking>  TourBookings => Set<TourBooking>();
         public DbSet<PackageBooking> PackageBookings => Set<PackageBooking>();
         public DbSet<Tour> Tours { get; set; }
+        public DbSet<Payments> Payments => Set<Payments>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

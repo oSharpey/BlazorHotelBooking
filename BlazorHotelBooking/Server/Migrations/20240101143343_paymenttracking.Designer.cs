@@ -4,6 +4,7 @@ using BlazorHotelBooking.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorHotelBooking.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240101143343_paymenttracking")]
+    partial class paymenttracking
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -307,10 +310,6 @@ namespace BlazorHotelBooking.Server.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("paymentType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.ToTable("Payments");
@@ -448,14 +447,14 @@ namespace BlazorHotelBooking.Server.Migrations
                         new
                         {
                             Id = "1",
-                            ConcurrencyStamp = "d411a17b-b268-492e-bb32-bbb446be6d32",
+                            ConcurrencyStamp = "21fec404-119e-4ec2-a028-69842e14be4d",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = "2",
-                            ConcurrencyStamp = "5a5f62a9-8e26-47b7-9127-401f5ee50046",
+                            ConcurrencyStamp = "d7e042a3-2c21-4a51-9861-f4d47549042d",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });

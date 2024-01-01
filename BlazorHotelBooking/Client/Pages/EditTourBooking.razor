@@ -22,7 +22,7 @@
    
     @{
         var total = selectedBooking.TotalPrice;
-        var surcharge = (double)total * 0.05;
+        surcharge = (double)total * 0.05;
     
         <p>Modifying this booking will also incure a 5% surcharge (£@surcharge)</p>
 
@@ -48,6 +48,7 @@
     private bool showOverlap = false;
     private int numOfOverlap;
     private int currentPeople;
+    private double surcharge;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -76,7 +77,7 @@
         }
         else
         {
-            await http.PutAsJsonAsync($"api/bookings/tour/{Id}", selectedBooking);
+            await http.PutAsJsonAsync($"api/bookings/tour/{Id}?surcharge={surcharge}", selectedBooking);
             NavigationManager.NavigateTo("/mybookings");
         }
     }

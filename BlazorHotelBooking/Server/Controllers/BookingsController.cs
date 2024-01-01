@@ -1,10 +1,12 @@
-﻿using BlazorHotelBooking.Server.Data;
+﻿using BlazorHotelBooking.Client.Pages;
+using BlazorHotelBooking.Server.Data;
 using BlazorHotelBooking.Shared;
 using BlazorHotelBooking.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 
 
 namespace BlazorHotelBooking.Server.Controllers
@@ -55,6 +57,7 @@ namespace BlazorHotelBooking.Server.Controllers
         public async Task<ActionResult<string>> PayHotelRemainder(string id)
         {
             var dbHotel = await _context.HotelBookings.FindAsync(id);
+            var payment = new Payments();
 
             if (dbHotel == null)
             {
@@ -66,8 +69,17 @@ namespace BlazorHotelBooking.Server.Controllers
                 return BadRequest("You have already paid in full");
             }
 
-            dbHotel.DepositAmountPaid = dbHotel.TotalPrice;
+            //dbHotel.DepositAmountPaid = dbHotel.TotalPrice;
             dbHotel.PaidInfull = true;
+
+            payment.UserId = dbHotel.UserId;
+            payment.bookingId = dbHotel.Id;
+            payment.bookingType = "Hotel";
+            payment.AmountPaid = dbHotel.TotalPrice - dbHotel.DepositAmountPaid;
+            payment.paymentType = "PayRemainder";
+
+            _context.Payments.Add(payment);
+
 
             _context.HotelBookings.Update(dbHotel);
             await _context.SaveChangesAsync();
@@ -75,11 +87,12 @@ namespace BlazorHotelBooking.Server.Controllers
             return Ok("Payment Successful");
         }
 
-
         [HttpPut("hotel/{id}")]
-        public async Task<ActionResult<string>> UpdateHotel(string id, HotelBooking hotl)
+        public async Task<ActionResult<string>> UpdateHotel(string id, HotelBooking hotl, decimal paymentRemainder, decimal surcharge)
         {
             var dbHotel = await _context.HotelBookings.FindAsync(id);
+            var payment = new Payments();
+            var payment2 = new Payments();
 
             if (dbHotel == null)
             {
@@ -100,12 +113,27 @@ namespace BlazorHotelBooking.Server.Controllers
             dbHotel.IsCancelled = hotl.IsCancelled;
             dbHotel.PaymentDueDate = hotl.PaymentDueDate;
 
+
+            payment.UserId = dbHotel.UserId;
+            payment.bookingId = dbHotel.Id;
+            payment.bookingType = "Hotel";
+            payment.AmountPaid = paymentRemainder;
+            payment.paymentType = "ModifyBooking";
+
+            payment2.UserId = dbHotel.UserId;
+            payment2.bookingId = dbHotel.Id;
+            payment2.bookingType = "Hotel";
+            payment2.AmountPaid = surcharge;
+            payment2.paymentType = "Surcharge";
+
+            _context.Payments.Add(payment2);
+            _context.Payments.Add(payment);
+
             _context.HotelBookings.Update(dbHotel);
             await _context.SaveChangesAsync();
 
             return Ok("Booking Updated Successfuly");
         }
-
 
         [HttpGet("hotel/{id}")]
         public async Task<ActionResult<HotelBooking>> GetHotelBookingById(string id)
@@ -120,9 +148,6 @@ namespace BlazorHotelBooking.Server.Controllers
             return Ok(dbhotel);
         }
 
-
-
-        //check if bookings overlap
         [HttpGet("hotel/overlap")]
         public ActionResult<int> CheckIfBookingOverlaps(DateTime checkIn, DateTime checkOut, int hotelId, string roomType)
         {
@@ -149,6 +174,7 @@ namespace BlazorHotelBooking.Server.Controllers
         public async Task<ActionResult<List<Hotel>>> DeleteHotelBooking(string id)
         {
             var dbHotel = await _context.HotelBookings.FindAsync(id);
+            var payment = new Payments();
             var today = DateTime.Now;
             var datediff = dbHotel.CheckIn - today;
 
@@ -161,7 +187,24 @@ namespace BlazorHotelBooking.Server.Controllers
             {
                 return BadRequest("You cannot cancel this booking");
             }
-           
+
+            payment.UserId = dbHotel.UserId;
+            payment.bookingId = dbHotel.Id;
+            payment.bookingType = "Hotel";
+
+            if (dbHotel.PaidInfull == true)
+            {
+                payment.AmountPaid = dbHotel.TotalPrice * -1;
+            }
+            else
+            {
+                payment.AmountPaid = dbHotel.DepositAmountPaid * -1;
+            }
+
+            payment.paymentType = "Refund";
+
+            _context.Payments.Add(payment);
+
             _context.HotelBookings.Remove(dbHotel);
             await _context.SaveChangesAsync();
 
@@ -171,11 +214,23 @@ namespace BlazorHotelBooking.Server.Controllers
         [HttpPost("hotel/book")]
         public async Task<ActionResult<List<HotelBooking>>> AddHotelBooking(HotelBooking hotl)
         {
+
+            Payments payment = new Payments();
+            payment.UserId = hotl.UserId;
+            payment.bookingId = hotl.Id;
+            payment.bookingType = "Hotel";
+            payment.AmountPaid = hotl.DepositAmountPaid;
+            payment.paymentType = "Deposit";
+
+            _context.Payments.Add(payment);
+
             _context.HotelBookings.Add(hotl);
             await _context.SaveChangesAsync();
 
             return Ok("Booking Successful");
         }
+
+
 
 
 
@@ -208,7 +263,7 @@ namespace BlazorHotelBooking.Server.Controllers
         public async Task<ActionResult<string>> PayTourRemainder(string id)
         {
             var dbTour = await _context.TourBookings.FindAsync(id);
-
+            var payment = new Payments();
             if (dbTour == null)
             {
                 return NotFound("This tour does not exist");
@@ -219,8 +274,17 @@ namespace BlazorHotelBooking.Server.Controllers
                 return BadRequest("You have already paid in full");
             }
 
-            dbTour.DepositAmountPaid = dbTour.TotalPrice;
+           // dbTour.DepositAmountPaid = dbTour.TotalPrice;
             dbTour.PaidInfull = true;
+
+
+            payment.UserId = dbTour.UserId;
+            payment.bookingId = dbTour.Id;
+            payment.bookingType = "Tour";
+            payment.AmountPaid = dbTour.TotalPrice - dbTour.DepositAmountPaid;
+            payment.paymentType = "PayRemainder";
+
+            _context.Payments.Add(payment);
 
             _context.TourBookings.Update(dbTour);
             await _context.SaveChangesAsync();
@@ -230,9 +294,10 @@ namespace BlazorHotelBooking.Server.Controllers
 
 
         [HttpPut("tour/{id}")]
-        public async Task<ActionResult<string>> UpdateTour(string id, TourBooking tour)
+        public async Task<ActionResult<string>> UpdateTour(string id, TourBooking tour, decimal surcharge)
         {
             var dbTour = await _context.TourBookings.FindAsync(id);
+            var payment2 = new Payments();
 
             if (dbTour == null)
             {
@@ -251,6 +316,15 @@ namespace BlazorHotelBooking.Server.Controllers
             dbTour.PaidInfull = tour.PaidInfull;
             dbTour.IsCancelled = tour.IsCancelled;
             dbTour.PaymentDueDate = tour.PaymentDueDate;
+
+        
+            payment2.UserId = dbTour.UserId;
+            payment2.bookingId = dbTour.Id;
+            payment2.bookingType = "Tour";
+            payment2.AmountPaid = surcharge;
+            payment2.paymentType = "Surcharge";
+
+            _context.Payments.Add(payment2);
 
             _context.TourBookings.Update(dbTour);
             await _context.SaveChangesAsync();
@@ -310,6 +384,7 @@ namespace BlazorHotelBooking.Server.Controllers
             var dbTour = await _context.TourBookings.FindAsync(id);
             var today = DateTime.Now;
             var datediff = dbTour.CommencementDate - today;
+            var payment = new Payments();
 
             if (dbTour == null)
             {
@@ -321,6 +396,24 @@ namespace BlazorHotelBooking.Server.Controllers
                 return BadRequest("You cannot cancel this booking");
             }
 
+
+            payment.UserId = dbTour.UserId;
+            payment.bookingId = dbTour.Id;
+            payment.bookingType = "Package";
+
+            if (dbTour.PaidInfull == true)
+            {
+                payment.AmountPaid = dbTour.TotalPrice * -1;
+            }
+            else
+            {
+                payment.AmountPaid = dbTour.DepositAmountPaid * -1;
+            }
+
+            payment.paymentType = "Refund";
+
+            _context.Payments.Add(payment);
+
             _context.TourBookings.Remove(dbTour);
             await _context.SaveChangesAsync();
 
@@ -330,6 +423,16 @@ namespace BlazorHotelBooking.Server.Controllers
         [HttpPost("tour/book")]
         public async Task<ActionResult<string>> AddTourBooking(TourBooking tour)
         {
+
+            Payments payment = new Payments();
+            payment.UserId = tour.UserId;
+            payment.bookingId = tour.Id;
+            payment.bookingType = "Tour";
+            payment.AmountPaid = tour.DepositAmountPaid;
+            payment.paymentType = "Deposit";
+
+            _context.Payments.Add(payment);
+
             _context.TourBookings.Add(tour);
             await _context.SaveChangesAsync();
 
@@ -343,6 +446,17 @@ namespace BlazorHotelBooking.Server.Controllers
         [HttpPost("package/book")]
         public async Task<ActionResult<string>> AddPackageBooking(PackageBooking pkg)
         {
+
+            Payments payment = new Payments();
+            payment.UserId = pkg.UserId;
+            payment.bookingId = pkg.Id;
+            payment.bookingType = "Package";
+            payment.AmountPaid = pkg.DepositAmountPaid;
+            payment.paymentType = "Deposit";
+
+            _context.Payments.Add(payment);
+
+
             _context.PackageBookings.Add(pkg);
             await _context.SaveChangesAsync();
 
@@ -384,6 +498,7 @@ namespace BlazorHotelBooking.Server.Controllers
         public async Task<ActionResult<string>> PayPackageRemainder(string id)
         {
             var dbPackage = await _context.PackageBookings.FindAsync(id);
+            var payment = new Payments();
 
             if (dbPackage == null)
             {
@@ -395,7 +510,16 @@ namespace BlazorHotelBooking.Server.Controllers
                 return BadRequest("You have already paid in full");
             }
 
-            dbPackage.DepositAmountPaid = dbPackage.TotalPrice;
+            //dbPackage.DepositAmountPaid = dbPackage.TotalPrice;
+
+            payment.UserId = dbPackage.UserId;
+            payment.bookingId = dbPackage.Id;
+            payment.bookingType = "Package";
+            payment.AmountPaid = dbPackage.TotalPrice - dbPackage.DepositAmountPaid;
+            payment.paymentType = "PayRemainder";
+
+            _context.Payments.Add(payment);
+
             dbPackage.PaidInfull = true;
 
             _context.PackageBookings.Update(dbPackage);
@@ -404,11 +528,12 @@ namespace BlazorHotelBooking.Server.Controllers
             return Ok("Payment Successful");
         }
 
-
         [HttpPut("package/{id}")]
-        public async Task<ActionResult<string>> UpdatePackage(string id, PackageBooking pkg)
+        public async Task<ActionResult<string>> UpdatePackage(string id, PackageBooking pkg, decimal paymentRemainder, decimal surcharge)
         {
             var dbPackage = await _context.PackageBookings.FindAsync(id);
+            var payment = new Payments();
+            var payment2 = new Payments();
 
             if (dbPackage == null)
             {
@@ -432,6 +557,29 @@ namespace BlazorHotelBooking.Server.Controllers
             dbPackage.PaidInfull = pkg.PaidInfull;
             dbPackage.IsCancelled = pkg.IsCancelled;
             dbPackage.PaymentDueDate = pkg.PaymentDueDate;
+
+
+            if (paymentRemainder != 0)
+            {
+                payment.UserId = dbPackage.UserId;
+                payment.bookingId = dbPackage.Id;
+                payment.bookingType = "Package";
+                payment.AmountPaid = paymentRemainder;
+                payment.paymentType = "ModifyBooking";
+                _context.Payments.Add(payment);
+            }
+
+
+            payment2.UserId = dbPackage.UserId;
+            payment2.bookingId = dbPackage.Id;
+            payment2.bookingType = "Package";
+            payment2.AmountPaid = surcharge;
+            payment2.paymentType = "Surcharge";
+
+            _context.Payments.Add(payment2);
+            
+
+
 
             _context.PackageBookings.Update(dbPackage);
             await _context.SaveChangesAsync();
@@ -460,6 +608,7 @@ namespace BlazorHotelBooking.Server.Controllers
             var today = DateTime.Now;
             var tourdatediff = dbPackage.TourStartDate - today;
             var hoteldatediff = dbPackage.HotelCheckIn - today;
+            var payment = new Payments();
 
             if (dbPackage == null)
             {
@@ -470,6 +619,25 @@ namespace BlazorHotelBooking.Server.Controllers
             {
                 return BadRequest("You cannot cancel this booking");
             }
+
+            payment.UserId = dbPackage.UserId;
+            payment.bookingId = dbPackage.Id;
+            payment.bookingType = "Package";
+
+            if (dbPackage.PaidInfull == true)
+            {
+                payment.AmountPaid = dbPackage.TotalPrice * -1;
+            }
+            else
+            {
+                payment.AmountPaid = dbPackage.DepositAmountPaid * -1;
+            }
+
+            payment.paymentType = "Refund";
+
+            _context.Payments.Add(payment);
+
+
 
             _context.PackageBookings.Remove(dbPackage);
             await _context.SaveChangesAsync();

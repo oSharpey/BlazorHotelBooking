@@ -1,0 +1,66 @@
+﻿@page "/admin/payments"
+@using BlazorHotelBooking.Shared
+@using Microsoft.AspNetCore.Authorization
+@using System.Security.Claims
+@inject HttpClient http
+@inject NavigationManager NavigationManager
+@attribute [Authorize(Roles ="Admin")]
+
+
+@if (payments is null)
+{
+    <span>Loading Payments…</span>
+}
+else
+{
+    <h5>Payments</h5>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>User ID</th>
+                <th>Booking ID</th>
+                <th>Booking Type</th>
+                <th>Payment Type</th>
+                <th>Payment Date</th>
+                <th>Amount Paid</th>
+            </tr>
+
+        </thead>
+        <tbody>
+            @foreach (var p in payments)
+            {
+                <tr>
+                    <td width="5%">@p.UserId</td>
+                    <td width="5%">@p.bookingId</td>
+                    <td width="5%">@p.bookingType</td>
+                    <td width="5%">@p.paymentType</td>
+                    <td width="5%">@p.PaymentDate</td>
+                    <td width="5%">@p.AmountPaid</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+
+
+
+@code {
+    List<Payments> payments = new List<Payments>();
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await http.GetFromJsonAsync<List<Payments>>($"/api/Payment");
+        if (result != null)
+        {
+            payments = result;
+        }
+    }
+
+   
+}
