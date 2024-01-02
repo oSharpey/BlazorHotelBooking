@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using BlazorHotelBooking.Server.Data;
 using BlazorHotelBooking.Shared;
-using BlazorHotelBooking.Server.Data;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BlazorHotelBooking.Server.Controllers
 {
@@ -23,20 +21,20 @@ namespace BlazorHotelBooking.Server.Controllers
 
 
         // Admin for Hotels
-        
+
         [HttpGet("hotel")]
         public async Task<ActionResult<List<Hotel>>> GetAllHotels()
         {
-            var list = await _context.Hotels.ToListAsync();
+            List<Hotel> list = await _context.Hotels.ToListAsync();
 
             return Ok(list);
         }
-        
-        
+
+
         [HttpGet("hotel/{id}")]
         public async Task<ActionResult<Hotel>> GetHotel(int id)
         {
-            var dbhotel = await _context.Hotels.FindAsync(id);
+            Hotel? dbhotel = await _context.Hotels.FindAsync(id);
 
             if (dbhotel == null)
             {
@@ -46,7 +44,7 @@ namespace BlazorHotelBooking.Server.Controllers
             return Ok(dbhotel);
         }
 
-       
+
         [HttpPost("hotel")]
         public async Task<ActionResult<List<Hotel>>> AddHotel(Hotel hotl)
         {
@@ -56,11 +54,11 @@ namespace BlazorHotelBooking.Server.Controllers
             return await GetAllHotels();
         }
 
-        
+
         [HttpPut("hotel/{id}")]
         public async Task<ActionResult<List<Hotel>>> UpdateHotel(int id, Hotel hotl)
         {
-            var dbHotel = await _context.Hotels.FindAsync(id);
+            Hotel? dbHotel = await _context.Hotels.FindAsync(id);
 
             if (dbHotel == null)
             {
@@ -80,11 +78,11 @@ namespace BlazorHotelBooking.Server.Controllers
             return await GetAllHotels();
         }
 
-        
+
         [HttpDelete("hotel/{id}")]
         public async Task<ActionResult<List<Hotel>>> DeleteHotel(int id)
         {
-            var dbHotel = await _context.Hotels.FindAsync(id);
+            Hotel? dbHotel = await _context.Hotels.FindAsync(id);
 
             if (dbHotel == null)
             {
@@ -103,7 +101,7 @@ namespace BlazorHotelBooking.Server.Controllers
         [HttpGet("tour")]
         public async Task<ActionResult<List<Tour>>> GetAllTours()
         {
-            var list = await _context.Tours.ToListAsync();
+            List<Tour> list = await _context.Tours.ToListAsync();
 
             return Ok(list);
         }
@@ -111,7 +109,7 @@ namespace BlazorHotelBooking.Server.Controllers
         [HttpGet("tour/{id}")]
         public async Task<ActionResult<Tour>> GetTour(int id)
         {
-            var dbtour = await _context.Tours.FindAsync(id);
+            Tour? dbtour = await _context.Tours.FindAsync(id);
 
             if (dbtour == null)
             {
@@ -135,7 +133,7 @@ namespace BlazorHotelBooking.Server.Controllers
         [HttpPut("tour/{id}")]
         public async Task<ActionResult<List<Tour>>> UpdateTour(int id, Tour tour)
         {
-            var dbtour = await _context.Tours.FindAsync(id);
+            Tour? dbtour = await _context.Tours.FindAsync(id);
 
             if (dbtour == null)
             {
@@ -159,7 +157,7 @@ namespace BlazorHotelBooking.Server.Controllers
         [HttpDelete("tour/{id}")]
         public async Task<ActionResult<List<Tour>>> DeleteTour(int id)
         {
-            var dbtour = await _context.Tours.FindAsync(id);
+            Tour? dbtour = await _context.Tours.FindAsync(id);
 
             if (dbtour == null)
             {
@@ -177,21 +175,21 @@ namespace BlazorHotelBooking.Server.Controllers
         [HttpGet("hotelbooking")]
         public async Task<ActionResult<List<HotelBooking>>> GetAllHotelBookings()
         {
-            var list = await _context.HotelBookings.ToListAsync();
+            List<HotelBooking> list = await _context.HotelBookings.ToListAsync();
 
             return Ok(list);
         }
         [HttpGet("tourbooking")]
         public async Task<ActionResult<List<TourBooking>>> GetAllTourBookings()
         {
-            var list = await _context.TourBookings.ToListAsync();
+            List<TourBooking> list = await _context.TourBookings.ToListAsync();
 
             return Ok(list);
         }
         [HttpGet("packagebooking")]
         public async Task<ActionResult<List<PackageBooking>>> GetAllPackageBookings()
         {
-            var list = await _context.PackageBookings.ToListAsync();
+            List<PackageBooking> list = await _context.PackageBookings.ToListAsync();
 
             return Ok(list);
         }

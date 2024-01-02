@@ -12,7 +12,7 @@ namespace BlazorHotelBooking.Shared.Models
         public string? Password { get; set; }
 
         [DataType(DataType.Password), Display(Name = "Confirm Password"),
-            Compare("Password", ErrorMessage="Passwords Do Not Match")]
+            Compare("Password", ErrorMessage = "Passwords Do Not Match")]
         public string? ConfirmPassword { get; set; }
 
         [Required, Display(Name = "Passport Number")]

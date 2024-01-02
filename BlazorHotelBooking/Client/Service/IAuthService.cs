@@ -7,6 +7,5 @@ namespace BlazorHotelBooking.Client.Service
         Task<RegisterResult> Register(RegisterModel registerModel);
         Task<LoginResult> Login(LoginModel loginModel);
         Task Logout();
-
     }
 }

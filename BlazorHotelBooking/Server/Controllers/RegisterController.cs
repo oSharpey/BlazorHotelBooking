@@ -1,6 +1,5 @@
-﻿using BlazorHotelBooking.Shared.Models;
-using BlazorHotelBooking.Server.Models;
-using Microsoft.AspNetCore.Http;
+﻿using BlazorHotelBooking.Server.Models;
+using BlazorHotelBooking.Shared.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,7 +9,7 @@ namespace BlazorHotelBooking.Server.Controllers
     [ApiController]
     public class RegisterController : ControllerBase
     {
-       private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         public RegisterController(UserManager<ApplicationUser> userManager)
         {
@@ -20,7 +19,7 @@ namespace BlazorHotelBooking.Server.Controllers
         [HttpPost]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
-            var user = new ApplicationUser
+            ApplicationUser user = new ApplicationUser
             {
                 UserName = model.Email,
                 Email = model.Email,
@@ -28,22 +27,22 @@ namespace BlazorHotelBooking.Server.Controllers
                 PhoneNumber = model.PhoneNumber
             };
 
-            var result = await _userManager.CreateAsync(user, model.Password);
+            IdentityResult result = await _userManager.CreateAsync(user, model.Password);
 
             if (!result.Succeeded)
             {
-                var errors = result.Errors.Select(e => e.Description);
+                IEnumerable<string> errors = result.Errors.Select(e => e.Description);
                 return Ok(new RegisterResult { Successful = false, Errors = errors });
             }
 
             await _userManager.AddToRoleAsync(user, "User");
-            if (user.Email == "admin@localhost")
-            {
-                await _userManager.AddToRoleAsync(user, "Admin");
-                return Ok(new RegisterResult { Successful = true });
-            }
+            //if (user.Email == "admin@localhost")
+            //{
+            //    await _userManager.AddToRoleAsync(user, "Admin");
+            //    return Ok(new RegisterResult { Successful = true });
+            //}
 
-            return Ok(new RegisterResult { Successful = true});
+            return Ok(new RegisterResult { Successful = true });
         }
     }
 }

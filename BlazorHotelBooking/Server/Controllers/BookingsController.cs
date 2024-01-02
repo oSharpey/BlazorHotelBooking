@@ -1,12 +1,9 @@
-﻿using BlazorHotelBooking.Client.Pages;
-using BlazorHotelBooking.Server.Data;
+﻿using BlazorHotelBooking.Server.Data;
 using BlazorHotelBooking.Shared;
 using BlazorHotelBooking.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Runtime.CompilerServices;
 
 
 namespace BlazorHotelBooking.Server.Controllers
@@ -34,13 +31,14 @@ namespace BlazorHotelBooking.Server.Controllers
             var query = from hotel in _context.Hotels
                         join booking in _context.HotelBookings on hotel.Id equals booking.HotelId
                         where booking.UserId == userId
-                        select new HotelBookingViewModel { 
+                        select new HotelBookingViewModel
+                        {
                             bookingId = booking.Id,
                             hotelName = hotel.Name,
-                            RoomType = booking.RoomType,  
-                            CheckIn = booking.CheckIn,  
+                            RoomType = booking.RoomType,
+                            CheckIn = booking.CheckIn,
                             CheckOut = booking.CheckOut,
-                            NumberOfNights = booking.NumberOfNights,  
+                            NumberOfNights = booking.NumberOfNights,
                             TotalPrice = booking.TotalPrice,
                             DepositAmountPaid = booking.DepositAmountPaid,
                             BookingDate = booking.BookingDate,
@@ -57,7 +55,7 @@ namespace BlazorHotelBooking.Server.Controllers
         public async Task<ActionResult<string>> PayHotelRemainder(string id)
         {
             var dbHotel = await _context.HotelBookings.FindAsync(id);
-            var payment = new Payments();
+            Payments payment = new Payments();
 
             if (dbHotel == null)
             {
@@ -83,7 +81,7 @@ namespace BlazorHotelBooking.Server.Controllers
 
             _context.HotelBookings.Update(dbHotel);
             await _context.SaveChangesAsync();
-            
+
             return Ok("Payment Successful");
         }
 
@@ -91,8 +89,8 @@ namespace BlazorHotelBooking.Server.Controllers
         public async Task<ActionResult<string>> UpdateHotel(string id, HotelBooking hotl, decimal paymentRemainder, decimal surcharge)
         {
             var dbHotel = await _context.HotelBookings.FindAsync(id);
-            var payment = new Payments();
-            var payment2 = new Payments();
+            Payments payment = new Payments();
+            Payments payment2 = new Payments();
 
             if (dbHotel == null)
             {
@@ -151,9 +149,9 @@ namespace BlazorHotelBooking.Server.Controllers
         [HttpGet("hotel/overlap")]
         public ActionResult<int> CheckIfBookingOverlaps(DateTime checkIn, DateTime checkOut, int hotelId, string roomType)
         {
-            var hotelOverlap =  _context.HotelBookings.Where(x => 
-                x.CheckIn <= checkOut && 
-                x.CheckOut >= checkIn && 
+            var hotelOverlap = _context.HotelBookings.Where(x =>
+                x.CheckIn <= checkOut &&
+                x.CheckOut >= checkIn &&
                 x.RoomType == roomType &&
                 x.HotelId == hotelId
             ).ToList().Count();
@@ -171,10 +169,10 @@ namespace BlazorHotelBooking.Server.Controllers
         }
 
         [HttpDelete("hotel/{id}")]
-        public async Task<ActionResult<List<Hotel>>> DeleteHotelBooking(string id)
+        public async Task<ActionResult<string>> DeleteHotelBooking(string id)
         {
             var dbHotel = await _context.HotelBookings.FindAsync(id);
-            var payment = new Payments();
+            Payments payment = new Payments();
             var today = DateTime.Now;
             var datediff = dbHotel.CheckIn - today;
 
@@ -212,7 +210,7 @@ namespace BlazorHotelBooking.Server.Controllers
         }
 
         [HttpPost("hotel/book")]
-        public async Task<ActionResult<List<HotelBooking>>> AddHotelBooking(HotelBooking hotl)
+        public async Task<ActionResult<string>> AddHotelBooking(HotelBooking hotl)
         {
 
             Payments payment = new Payments();
@@ -263,7 +261,7 @@ namespace BlazorHotelBooking.Server.Controllers
         public async Task<ActionResult<string>> PayTourRemainder(string id)
         {
             var dbTour = await _context.TourBookings.FindAsync(id);
-            var payment = new Payments();
+            Payments payment = new Payments();
             if (dbTour == null)
             {
                 return NotFound("This tour does not exist");
@@ -274,7 +272,7 @@ namespace BlazorHotelBooking.Server.Controllers
                 return BadRequest("You have already paid in full");
             }
 
-           // dbTour.DepositAmountPaid = dbTour.TotalPrice;
+            // dbTour.DepositAmountPaid = dbTour.TotalPrice;
             dbTour.PaidInfull = true;
 
 
@@ -297,7 +295,7 @@ namespace BlazorHotelBooking.Server.Controllers
         public async Task<ActionResult<string>> UpdateTour(string id, TourBooking tour, decimal surcharge)
         {
             var dbTour = await _context.TourBookings.FindAsync(id);
-            var payment2 = new Payments();
+            Payments payment2 = new Payments();
 
             if (dbTour == null)
             {
@@ -317,7 +315,7 @@ namespace BlazorHotelBooking.Server.Controllers
             dbTour.IsCancelled = tour.IsCancelled;
             dbTour.PaymentDueDate = tour.PaymentDueDate;
 
-        
+
             payment2.UserId = dbTour.UserId;
             payment2.bookingId = dbTour.Id;
             payment2.bookingType = "Tour";
@@ -350,21 +348,21 @@ namespace BlazorHotelBooking.Server.Controllers
         [HttpGet("tour/overlap")]
         public ActionResult<int> CheckIfTourBookingOverlaps(DateTime start, DateTime end, int tourId)
         {
-            int guestCount = 0;
-            var tourOverlap = _context.TourBookings.Where(x =>
+            var guestCount = 0;
+            List<TourBooking> tourOverlap = _context.TourBookings.Where(x =>
                 x.CommencementDate <= end &&
                 x.EndDate >= start &&
                 x.TourId == tourId
             ).ToList();
 
-            var packageOverlap = _context.PackageBookings.Where(x =>
+            List<PackageBooking> packageOverlap = _context.PackageBookings.Where(x =>
                 x.TourStartDate <= end &&
                 x.TourEndDate >= start &&
                 x.TourId == tourId
             ).ToList();
 
 
-            foreach(var item in tourOverlap)
+            foreach (var item in tourOverlap)
             {
                 guestCount += item.NumberOfPeople;
             }
@@ -374,7 +372,7 @@ namespace BlazorHotelBooking.Server.Controllers
                 guestCount += item.NumberOfPeopleOnTour;
             }
 
-           
+
             return Ok(guestCount);
         }
 
@@ -384,7 +382,7 @@ namespace BlazorHotelBooking.Server.Controllers
             var dbTour = await _context.TourBookings.FindAsync(id);
             var today = DateTime.Now;
             var datediff = dbTour.CommencementDate - today;
-            var payment = new Payments();
+            Payments payment = new Payments();
 
             if (dbTour == null)
             {
@@ -466,29 +464,30 @@ namespace BlazorHotelBooking.Server.Controllers
         [HttpGet("package/userbooking")]
         public async Task<ActionResult<List<TourBookingViewModel>>> GetAllPackageBookingsWithUserId(string userId)
         {
-            var query = from booking in _context.PackageBookings
-                        join tour in _context.Tours on booking.TourId equals tour.Id
-                        join hotel in _context.Hotels on booking.HotelId equals hotel.Id
-                        where booking.UserId == userId
-                        select new PackageBookingViewModel
-                        {
-                            bookingId = booking.Id,
-                            TourName = tour.Name,
-                            CommencementDate = booking.TourStartDate,
-                            EndDate = booking.TourEndDate,
-                            NumberOfGuests = booking.NumberOfPeopleOnTour,
-                            hotelName = hotel.Name,
-                            RoomType = booking.RoomType,
-                            CheckIn = booking.HotelCheckIn,
-                            CheckOut = booking.HotelCheckOut,
-                            NumberOfNights = booking.NumberOfNights,
-                            TotalPrice = booking.TotalPrice,
-                            DepositAmountPaid = booking.DepositAmountPaid,
-                            BookingDate = booking.BookingDate,
-                            paidInfull = booking.PaidInfull,
-                            IsCancelled = booking.IsCancelled,
-                            PaymentDueDate = booking.PaymentDueDate
-                        };
+            var query =
+                from booking in _context.PackageBookings
+                join tour in _context.Tours on booking.TourId equals tour.Id
+                join hotel in _context.Hotels on booking.HotelId equals hotel.Id
+                where booking.UserId == userId
+                select new PackageBookingViewModel
+                {
+                    bookingId = booking.Id,
+                    TourName = tour.Name,
+                    CommencementDate = booking.TourStartDate,
+                    EndDate = booking.TourEndDate,
+                    NumberOfGuests = booking.NumberOfPeopleOnTour,
+                    hotelName = hotel.Name,
+                    RoomType = booking.RoomType,
+                    CheckIn = booking.HotelCheckIn,
+                    CheckOut = booking.HotelCheckOut,
+                    NumberOfNights = booking.NumberOfNights,
+                    TotalPrice = booking.TotalPrice,
+                    DepositAmountPaid = booking.DepositAmountPaid,
+                    BookingDate = booking.BookingDate,
+                    paidInfull = booking.PaidInfull,
+                    IsCancelled = booking.IsCancelled,
+                    PaymentDueDate = booking.PaymentDueDate
+                };
             var result = await query.ToListAsync();
 
             return Ok(result);
@@ -498,7 +497,7 @@ namespace BlazorHotelBooking.Server.Controllers
         public async Task<ActionResult<string>> PayPackageRemainder(string id)
         {
             var dbPackage = await _context.PackageBookings.FindAsync(id);
-            var payment = new Payments();
+            Payments payment = new Payments();
 
             if (dbPackage == null)
             {
@@ -532,8 +531,8 @@ namespace BlazorHotelBooking.Server.Controllers
         public async Task<ActionResult<string>> UpdatePackage(string id, PackageBooking pkg, decimal paymentRemainder, decimal surcharge)
         {
             var dbPackage = await _context.PackageBookings.FindAsync(id);
-            var payment = new Payments();
-            var payment2 = new Payments();
+            Payments payment = new Payments();
+            Payments payment2 = new Payments();
 
             if (dbPackage == null)
             {
@@ -577,7 +576,7 @@ namespace BlazorHotelBooking.Server.Controllers
             payment2.paymentType = "Surcharge";
 
             _context.Payments.Add(payment2);
-            
+
 
 
 
@@ -589,7 +588,7 @@ namespace BlazorHotelBooking.Server.Controllers
 
 
         [HttpGet("package/{id}")]
-        public async Task<ActionResult<TourBooking>> GetPackageBookingById(string id)
+        public async Task<ActionResult<PackageBooking>> GetPackageBookingById(string id)
         {
             var dbPackage = await _context.PackageBookings.FindAsync(id);
 
@@ -608,7 +607,7 @@ namespace BlazorHotelBooking.Server.Controllers
             var today = DateTime.Now;
             var tourdatediff = dbPackage.TourStartDate - today;
             var hoteldatediff = dbPackage.HotelCheckIn - today;
-            var payment = new Payments();
+            Payments payment = new Payments();
 
             if (dbPackage == null)
             {

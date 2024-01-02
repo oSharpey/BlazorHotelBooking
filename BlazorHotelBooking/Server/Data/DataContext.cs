@@ -1,19 +1,19 @@
-﻿using BlazorHotelBooking.Shared;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using BlazorHotelBooking.Server.Models;
+using BlazorHotelBooking.Shared;
 using Microsoft.AspNetCore.Identity;
-using BlazorHotelBooking.Server.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace BlazorHotelBooking.Server.Data
 {
-    public class DataContext: IdentityDbContext<ApplicationUser>
+    public class DataContext : IdentityDbContext<ApplicationUser>
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
         }
         public DbSet<Hotel> Hotels { get; set; }
         public DbSet<HotelBooking> HotelBookings => Set<HotelBooking>();
-        public DbSet<TourBooking>  TourBookings => Set<TourBooking>();
+        public DbSet<TourBooking> TourBookings => Set<TourBooking>();
         public DbSet<PackageBooking> PackageBookings => Set<PackageBooking>();
         public DbSet<Tour> Tours { get; set; }
         public DbSet<Payments> Payments => Set<Payments>();

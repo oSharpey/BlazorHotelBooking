@@ -22,7 +22,7 @@ namespace BlazorHotelBooking.Server.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            
+
             migrationBuilder.AddPrimaryKey(
                 name: "PK_HotelBookings",
                 table: "HotelBookings",

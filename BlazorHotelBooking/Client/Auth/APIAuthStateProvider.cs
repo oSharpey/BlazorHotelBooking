@@ -19,7 +19,7 @@ namespace BlazorHotelBooking.Client.Auth
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            var userToken = await _localStorage.GetItemAsync<string>("authToken");
+            string userToken = await _localStorage.GetItemAsync<string>("authToken");
 
             if (string.IsNullOrWhiteSpace(userToken))
             {
@@ -33,24 +33,24 @@ namespace BlazorHotelBooking.Client.Auth
 
         public void MarkUserAsAuthenticated(string token)
         {
-            var authenticatedUser = new ClaimsPrincipal(new ClaimsIdentity(ParseClaimsFromJwt(token), "jwt"));
-            var authState = Task.FromResult(new AuthenticationState(authenticatedUser));
+            ClaimsPrincipal authenticatedUser = new ClaimsPrincipal(new ClaimsIdentity(ParseClaimsFromJwt(token), "jwt"));
+            Task<AuthenticationState> authState = Task.FromResult(new AuthenticationState(authenticatedUser));
             NotifyAuthenticationStateChanged(authState);
         }
-        
+
         public void MarkUserAsLoggedOut()
         {
-            var anonymousUser = new ClaimsPrincipal(new ClaimsIdentity());
-            var authState = Task.FromResult(new AuthenticationState(anonymousUser));
+            ClaimsPrincipal anonymousUser = new ClaimsPrincipal(new ClaimsIdentity());
+            Task<AuthenticationState> authState = Task.FromResult(new AuthenticationState(anonymousUser));
             NotifyAuthenticationStateChanged(authState);
         }
 
         private IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
         {
-            var claims = new List<Claim>();
-            var payload = jwt.Split('.')[1];
-            var jsonBytes = ParseBase64WithoutPadding(payload);
-            var keyValuePairs = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonBytes);
+            List<Claim> claims = new List<Claim>();
+            string payload = jwt.Split('.')[1];
+            byte[] jsonBytes = ParseBase64WithoutPadding(payload);
+            Dictionary<string, object>? keyValuePairs = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonBytes);
 
             keyValuePairs!.TryGetValue(ClaimTypes.Role, out object roles);
 
@@ -58,9 +58,9 @@ namespace BlazorHotelBooking.Client.Auth
             {
                 if (roles.ToString()!.Trim().StartsWith("["))
                 {
-                    var parsedRoles = JsonSerializer.Deserialize<string[]>(roles.ToString()!);
+                    string[]? parsedRoles = JsonSerializer.Deserialize<string[]>(roles.ToString()!);
 
-                    foreach (var parsedRole in parsedRoles!)
+                    foreach (string parsedRole in parsedRoles!)
                     {
                         claims.Add(new Claim(ClaimTypes.Role, parsedRole));
                     }

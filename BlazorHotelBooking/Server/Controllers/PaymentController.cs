@@ -1,7 +1,6 @@
 ﻿using BlazorHotelBooking.Server.Data;
 using BlazorHotelBooking.Shared;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,7 +22,7 @@ namespace BlazorHotelBooking.Server.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<List<Payments>>> GetAllPayments()
         {
-            var list = await _context.Payments.OrderByDescending(x => x.PaymentDate).ToListAsync();
+            List<Payments> list = await _context.Payments.OrderByDescending(x => x.PaymentDate).ToListAsync();
 
             return Ok(list);
         }
@@ -32,7 +31,7 @@ namespace BlazorHotelBooking.Server.Controllers
         [Authorize]
         public async Task<ActionResult<List<Payments>>> GetAllPaymentsByUserId(string id)
         {
-            var list = await _context.Payments.Where(x => x.UserId == id).OrderByDescending(x => x.PaymentDate).ToListAsync();
+            List<Payments> list = await _context.Payments.Where(x => x.UserId == id).OrderByDescending(x => x.PaymentDate).ToListAsync();
 
             return Ok(list);
         }

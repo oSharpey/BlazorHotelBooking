@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using BlazorHotelBooking.Server.Data;
 using BlazorHotelBooking.Shared;
-using BlazorHotelBooking.Server.Data;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace BlazorHotelBooking.Server.Controllers
@@ -25,7 +23,7 @@ namespace BlazorHotelBooking.Server.Controllers
         [HttpGet]
         public async Task<ActionResult<List<Hotel>>> GetAllHotels()
         {
-            var list = await _context.Hotels.ToListAsync();
+            List<Hotel> list = await _context.Hotels.ToListAsync();
 
             return Ok(list);
         }
@@ -33,7 +31,7 @@ namespace BlazorHotelBooking.Server.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Hotel>> GetHotel(int id)
         {
-            var dbhotel = await _context.Hotels.FindAsync(id);
+            Hotel? dbhotel = await _context.Hotels.FindAsync(id);
 
             if (dbhotel == null)
             {

@@ -164,14 +164,7 @@ else
     </div>
         
     }
-
-
-
-
 }
-
-
-
 
 @code {
     List<Hotel> hotels = new List<Hotel>();
@@ -247,10 +240,7 @@ else
 
     async Task BookPackage()
     {
-
-
         numOfHotelOverlap = await http.GetFromJsonAsync<int>($"/api/bookings/hotel/overlap?checkIn={newBooking.HotelCheckIn}&checkOut={newBooking.HotelCheckOut}&hotelId={selectedHotel.Id}&roomType={newBooking.RoomType}");
-
         numOfTourOverlap = await http.GetFromJsonAsync<int>($"/api/bookings/tour/overlap?start={newBooking.TourStartDate}&end={newBooking.TourEndDate}&tourId={selectedTour.Id}");
 
         if ((selectedTour.MaxNumberOfGuests < numOfTourOverlap + newBooking.NumberOfPeopleOnTour) && (numOfHotelOverlap > 20))

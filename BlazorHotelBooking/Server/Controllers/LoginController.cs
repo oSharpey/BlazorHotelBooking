@@ -1,6 +1,5 @@
 ﻿using BlazorHotelBooking.Server.Models;
 using BlazorHotelBooking.Shared.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -26,32 +25,32 @@ namespace BlazorHotelBooking.Server.Controllers
         [HttpPost]
         public async Task<IActionResult> Login([FromBody] LoginModel login)
         {
-            var result = await _signInManager.PasswordSignInAsync(login.Email, login.Password, false, false);
+            Microsoft.AspNetCore.Identity.SignInResult result = await _signInManager.PasswordSignInAsync(login.Email, login.Password, false, false);
 
             if (!result.Succeeded)
             {
                 return BadRequest(new LoginResult { Successful = false, Error = "Username and password are invalid." });
             }
 
-            var user = await _signInManager.UserManager.FindByEmailAsync(login.Email);
-            var roles = await _signInManager.UserManager.GetRolesAsync(user!);
-            var claims = new List<Claim>
+            ApplicationUser? user = await _signInManager.UserManager.FindByEmailAsync(login.Email);
+            IList<string> roles = await _signInManager.UserManager.GetRolesAsync(user!);
+            List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, login.Email)
             };
 
-            foreach (var role in roles)
+            foreach (string role in roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
 
             claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JwtKey"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var expiry = DateTime.Now.AddDays(Convert.ToInt32(_config["JwtExpiryInDays"]));
+            SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JwtKey"]));
+            SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            DateTime expiry = DateTime.Now.AddDays(Convert.ToInt32(_config["JwtExpiryInDays"]));
 
-            var token = new JwtSecurityToken(
+            JwtSecurityToken token = new JwtSecurityToken(
                 _config["JwtIssuer"],
                 _config["JwtAudience"],
                 claims,
