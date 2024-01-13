@@ -134,6 +134,13 @@
                 <p>There are no more spaces left in this tour for that many people on these dates please select new dates or less people.</p>
             </div>
         }
+
+        @if (showCannotBook)
+        {
+            <div class="alert alert-danger" role="alert">
+                <p>Please change number of guests or number of nights to greater than 0</p>
+            </div>
+        }
     }
     <button type="submit" class="btn btn-primary">Save</button>
 </EditForm> 
@@ -151,7 +158,7 @@
     private decimal newTotal, newDeposit;
     private DateTime newCheckOut;
     private int numOfTourOverlap, numOfHotelOverlap;
-    private bool showHotelOverlap, showTourOverlap = false;
+    private bool showHotelOverlap, showTourOverlap, showCannotBook = false;
     private decimal difference;
     private decimal surcharge;
 
@@ -174,6 +181,15 @@
 
     async Task HandleSubmit()
     {
+
+        if (selectedBooking.NumberOfNights < 1 || selectedBooking.NumberOfPeopleOnTour < 1 || selectedBooking.RoomType == null)
+        {
+            showCannotBook = true;
+            return;
+        }
+
+
+
 
         if (selectedBooking.PaidInfull)
         {

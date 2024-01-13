@@ -15,7 +15,7 @@ namespace BlazorHotelBooking.Shared
         public decimal TotalPrice { get; set; }
         [Column(TypeName = "decimal(18,2")]
         public decimal DepositAmountPaid { get; set; }
-        public int NumberOfPeople { get; set; }
+        public int NumberOfPeople { get; set; } = 1;
         public string UserId { get; set; }
         public DateTime BookingDate { get; set; } = DateTime.Now.Date;
         public bool PaidInfull { get; set; } = false;

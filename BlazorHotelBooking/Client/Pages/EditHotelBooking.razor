@@ -27,7 +27,7 @@
     </div>
     <div>
         <label for="NumOfNights">Number Of Nights</label>
-        <InputNumber id="NumOfNights" @bind-Value="selectedBooking.NumberOfNights" class="form-control" />
+        <InputNumber Min=1 id="NumOfNights" @bind-Value="selectedBooking.NumberOfNights" class="form-control" />
     </div>
     @{
         var currentDeposit = selectedBooking.DepositAmountPaid;
@@ -109,6 +109,13 @@
                 <p>There are no more spaces for this room on these dates please select new dates.</p>
             </div>
         }
+
+        @if (showCannotBook)
+        {
+            <div class="alert alert-danger" role="alert">
+                <p>Please change number of nights to greater than 0</p>
+            </div>
+        }
     }
     <button type="submit" class="btn btn-primary">Save</button>
 </EditForm> 
@@ -124,7 +131,7 @@
     private int currentNights;
     private decimal newTotal, newDeposit;
     private DateTime newCheckOut;
-    private bool showOverlap = false;
+    private bool showOverlap, showCannotBook = false;
     private int numOfOverlap;
     private decimal difference;
     private decimal surcharge;
@@ -147,6 +154,14 @@
 
     async Task HandleSubmit()
     {
+
+        if (selectedBooking.NumberOfNights <= 0)
+        {
+            showCannotBook = true;
+            return;
+        }
+
+
 
         if (selectedBooking.PaidInfull)
         {
