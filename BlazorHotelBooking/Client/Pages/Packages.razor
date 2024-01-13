@@ -153,6 +153,13 @@ else
                     </div>
                 }
 
+                @if(showCannotBook)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        <p>Please change number of guests or number of nights to greater than 0</p>
+                    </div>
+                }
+
                 <button type="button" class="btn btn-success" @onclick="BookPackage">Book</button>
 
             </EditForm>
@@ -178,7 +185,7 @@ else
     private string max;
     private string userId;
     private int numOfTourOverlap, numOfHotelOverlap;
-    private bool showHotelOverlap, showTourOverlap = false;
+    private bool showHotelOverlap, showTourOverlap, showCannotBook = false;
 
 
     [CascadingParameter]
@@ -244,7 +251,9 @@ else
         if (newBooking.NumberOfNights < 1 || newBooking.NumberOfPeopleOnTour < 1 || newBooking.RoomType == null)
         {
             return;
+            showCannotBook = true;
         }
+
         numOfHotelOverlap = await http.GetFromJsonAsync<int>($"/api/bookings/hotel/overlap?checkIn={newBooking.HotelCheckIn}&checkOut={newBooking.HotelCheckOut}&hotelId={selectedHotel.Id}&roomType={newBooking.RoomType}");
         numOfTourOverlap = await http.GetFromJsonAsync<int>($"/api/bookings/tour/overlap?start={newBooking.TourStartDate}&end={newBooking.TourEndDate}&tourId={selectedTour.Id}");
 

@@ -92,6 +92,13 @@
                     </div>
                 }
 
+                @if (showCannotBook)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        <p>Please change number of nights to greater than 0</p>
+                    </div>
+                }
+
                 <button type="button" class="btn btn-success" @onclick="BookHotel">Book</button>
 
             </EditForm>
@@ -113,7 +120,7 @@
     private string max;
     private string userId;
     private int numOfOverlap;
-    private bool showOverlap = false;
+    private bool showOverlap, showCannotBook = false;
 
     [CascadingParameter]
     private Task<AuthenticationState>? authenticationState { get; set; }
@@ -154,6 +161,7 @@
         if (newBooking.NumberOfNights < 1)
         {
             return;
+            showCannotBook = true;
         }
 
 
