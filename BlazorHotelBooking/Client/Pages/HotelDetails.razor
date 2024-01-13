@@ -54,7 +54,7 @@
                 </div>
                 <div class="form-group mt-3">
                     <label class="control-label">Number of nights</label>
-                    <InputNumber id="NumOfNights" @bind-Value="newBooking.NumberOfNights" class="form-control" />
+                    <InputNumber Min=1 id="NumOfNights" @bind-Value="newBooking.NumberOfNights" class="form-control" />
                     <ValidationMessage For="@(() => newBooking.NumberOfNights)" />
                 </div>
                 
@@ -149,6 +149,13 @@
 
     async Task BookHotel()
     {
+
+
+        if (newBooking.NumberOfNights < 1)
+        {
+            return;
+        }
+
 
         //code to check if the newbooking overlaps with existing bookings
         numOfOverlap = await http.GetFromJsonAsync<int>($"/api/bookings/hotel/overlap?checkIn={newBooking.CheckIn}&checkOut={newBooking.CheckOut}&hotelId={selectedHotel.Id}&roomType={newBooking.RoomType}");

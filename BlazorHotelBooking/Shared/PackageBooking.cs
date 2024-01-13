@@ -10,14 +10,14 @@ namespace BlazorHotelBooking.Shared
         public string RoomType { get; set; }
         public DateTime HotelCheckIn { get; set; } = DateTime.Now.Date.AddMonths(2);
         public DateTime HotelCheckOut { get; set; }
-        public int NumberOfNights { get; set; }
+        public int NumberOfNights { get; set; } = 1;
         public int TourId { get; set; }
         [Required(ErrorMessage = "Commencement Date required.")]
         public DateTime TourStartDate { get; set; } = DateTime.Now.Date.AddMonths(2);
         public DateTime TourEndDate { get; set; }
         [Column(TypeName = "decimal(18,2")]
         public decimal TotalPrice { get; set; }
-        public int NumberOfPeopleOnTour { get; set; }
+        public int NumberOfPeopleOnTour { get; set; } = 1;
         [Column(TypeName = "decimal(18,2")]
         public decimal DepositAmountPaid { get; set; }
         public string UserId { get; set; }

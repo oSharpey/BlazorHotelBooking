@@ -122,6 +122,12 @@
     async Task BookTour()
     {
 
+
+        if (newBooking.NumberOfPeople < 1)
+        {
+            return;
+        }
+
         // Need to change for tours 
 
         // code to check if the newbooking overlaps with existing bookings
