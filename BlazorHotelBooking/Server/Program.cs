@@ -39,6 +39,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             };
         });
 
+builder.Services.Configure<PasswordHasherOptions>(options =>
+{
+    options.IterationCount = 210_000;
+});
+
 
 WebApplication app = builder.Build();
 
