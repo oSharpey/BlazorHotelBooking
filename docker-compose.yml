@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  blazorhotelbooking.server:
+    image: ${DOCKER_REGISTRY-}blazorhotelbookingserver
+    build:
+      context: .
+      dockerfile: BlazorHotelBooking/Server/Dockerfile

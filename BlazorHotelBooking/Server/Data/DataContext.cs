@@ -3,6 +3,8 @@ using BlazorHotelBooking.Shared;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace BlazorHotelBooking.Server.Data
 {
@@ -10,6 +12,20 @@ namespace BlazorHotelBooking.Server.Data
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
+            var dbCreator = Database.GetService<IDatabaseCreator>() as RelationalDatabaseCreator;
+            if (dbCreator != null)
+            {
+                if (!dbCreator.CanConnect())
+                {
+                    dbCreator.Create();
+                }
+
+                if (!dbCreator.HasTables())
+                {
+                    dbCreator.CreateTables();
+                }
+            }
+
         }
         public DbSet<Hotel> Hotels { get; set; }
         public DbSet<HotelBooking> HotelBookings => Set<HotelBooking>();
