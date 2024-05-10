@@ -24,6 +24,8 @@ namespace BlazorHotelBooking.Server.Data
                 {
                     dbCreator.CreateTables();
                 }
+
+                
             }
 
 

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorHotelBooking.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231230154251_paymentduedate")]
-    partial class paymentduedate
+    [Migration("20240510190713_azure")]
+    partial class azure
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -103,20 +103,20 @@ namespace BlazorHotelBooking.Server.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("DBPrice")
-                        .HasColumnType("decimal(18,2");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("FamPrice")
-                        .HasColumnType("decimal(18,2");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("SBPrice")
-                        .HasColumnType("decimal(18,2");
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -194,7 +194,7 @@ namespace BlazorHotelBooking.Server.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("DepositAmountPaid")
-                        .HasColumnType("decimal(18,2");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("HotelId")
                         .HasColumnType("int");
@@ -216,7 +216,7 @@ namespace BlazorHotelBooking.Server.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("TotalPrice")
-                        .HasColumnType("decimal(18,2");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -225,6 +225,200 @@ namespace BlazorHotelBooking.Server.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("HotelBookings");
+                });
+
+            modelBuilder.Entity("BlazorHotelBooking.Shared.PackageBooking", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("BookingDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("DepositAmountPaid")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("HotelCheckIn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("HotelCheckOut")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("HotelId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsCancelled")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("NumberOfNights")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NumberOfPeopleOnTour")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("PaidInfull")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("PaymentDueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RoomType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("TourEndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TourId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("TourStartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PackageBookings");
+                });
+
+            modelBuilder.Entity("BlazorHotelBooking.Shared.Payments", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<decimal>("AmountPaid")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("bookingId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("bookingType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("paymentType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Payments");
+                });
+
+            modelBuilder.Entity("BlazorHotelBooking.Shared.Tour", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Cost")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DurationInDays")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaxNumberOfGuests")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tours");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Cost = 1200m,
+                            Description = "Dive into charming villages, rolling hills, and iconic castles in this 6-day escape to authentic Britain",
+                            DurationInDays = 6,
+                            MaxNumberOfGuests = 30,
+                            Name = "Real Britain"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Cost = 2000m,
+                            Description = "Journey through 16 days of cityscapes, dramatic coasts, and Celtic charm. Uncover the best of Britain and Ireland.",
+                            DurationInDays = 16,
+                            MaxNumberOfGuests = 40,
+                            Name = "Britain and Ireland Explorer"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Cost = 2900m,
+                            Description = "Indulge in 12 days of luxury. Explore stately homes, savor Michelin stars, and discover hidden gems of Britain's finest",
+                            DurationInDays = 12,
+                            MaxNumberOfGuests = 30,
+                            Name = "Best of Britain"
+                        });
+                });
+
+            modelBuilder.Entity("BlazorHotelBooking.Shared.TourBooking", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("BookingDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CommencementDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("DepositAmountPaid")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsCancelled")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("NumberOfPeople")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("PaidInfull")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("PaymentDueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("TourId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TourBookings");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -257,14 +451,14 @@ namespace BlazorHotelBooking.Server.Migrations
                         new
                         {
                             Id = "1",
-                            ConcurrencyStamp = "00efb88a-129b-4cbd-92b4-3523b060a745",
+                            ConcurrencyStamp = "49d8a498-e8c6-4ab1-bc7a-326c3bb5c542",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = "2",
-                            ConcurrencyStamp = "e107e00d-73f9-445c-b74b-b04f3718f015",
+                            ConcurrencyStamp = "bafa3719-ddf0-4928-bfb3-202c66a599fb",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });

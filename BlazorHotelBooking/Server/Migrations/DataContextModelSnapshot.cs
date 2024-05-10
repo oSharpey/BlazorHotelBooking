@@ -100,20 +100,20 @@ namespace BlazorHotelBooking.Server.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("DBPrice")
-                        .HasColumnType("decimal(18,2");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("FamPrice")
-                        .HasColumnType("decimal(18,2");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("SBPrice")
-                        .HasColumnType("decimal(18,2");
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -191,7 +191,7 @@ namespace BlazorHotelBooking.Server.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("DepositAmountPaid")
-                        .HasColumnType("decimal(18,2");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("HotelId")
                         .HasColumnType("int");
@@ -213,7 +213,7 @@ namespace BlazorHotelBooking.Server.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("TotalPrice")
-                        .HasColumnType("decimal(18,2");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -233,7 +233,7 @@ namespace BlazorHotelBooking.Server.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("DepositAmountPaid")
-                        .HasColumnType("decimal(18,2");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("HotelCheckIn")
                         .HasColumnType("datetime2");
@@ -264,7 +264,7 @@ namespace BlazorHotelBooking.Server.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("TotalPrice")
-                        .HasColumnType("decimal(18,2");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("TourEndDate")
                         .HasColumnType("datetime2");
@@ -325,7 +325,7 @@ namespace BlazorHotelBooking.Server.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Cost")
-                        .HasColumnType("decimal(18,2");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -386,7 +386,7 @@ namespace BlazorHotelBooking.Server.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("DepositAmountPaid")
-                        .HasColumnType("decimal(18,2");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
@@ -404,7 +404,7 @@ namespace BlazorHotelBooking.Server.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("TotalPrice")
-                        .HasColumnType("decimal(18,2");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("TourId")
                         .HasColumnType("int");
@@ -448,14 +448,14 @@ namespace BlazorHotelBooking.Server.Migrations
                         new
                         {
                             Id = "1",
-                            ConcurrencyStamp = "d411a17b-b268-492e-bb32-bbb446be6d32",
+                            ConcurrencyStamp = "49d8a498-e8c6-4ab1-bc7a-326c3bb5c542",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = "2",
-                            ConcurrencyStamp = "5a5f62a9-8e26-47b7-9127-401f5ee50046",
+                            ConcurrencyStamp = "bafa3719-ddf0-4928-bfb3-202c66a599fb",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });

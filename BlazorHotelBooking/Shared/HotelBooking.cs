@@ -15,9 +15,9 @@ namespace BlazorHotelBooking.Shared
         public DateTime CheckOut { get; set; }
         [Required(ErrorMessage = "Number of Nigts required.")]
         public int NumberOfNights { get; set; } = 1;
-        [Column(TypeName = "decimal(18,2")]
+        [Column(TypeName = "decimal(18,2)")]
         public decimal TotalPrice { get; set; }
-        [Column(TypeName = "decimal(18,2")]
+        [Column(TypeName = "decimal(18,2)")]
         public decimal DepositAmountPaid { get; set; }
         public string UserId { get; set; }
         public DateTime BookingDate { get; set; } = DateTime.Now.Date;

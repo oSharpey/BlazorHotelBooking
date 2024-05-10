@@ -14,8 +14,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		BlazorHotelBooking\Client\.editorconfig = BlazorHotelBooking\Client\.editorconfig
 	EndProjectSection
 EndProject
-Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{FDFF6B4E-3374-4A0B-9830-F168DFCC70E3}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,10 +32,6 @@ Global
 		{21E6D324-C570-4483-9CDB-06426D7B87B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{21E6D324-C570-4483-9CDB-06426D7B87B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{21E6D324-C570-4483-9CDB-06426D7B87B0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FDFF6B4E-3374-4A0B-9830-F168DFCC70E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FDFF6B4E-3374-4A0B-9830-F168DFCC70E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FDFF6B4E-3374-4A0B-9830-F168DFCC70E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FDFF6B4E-3374-4A0B-9830-F168DFCC70E3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
