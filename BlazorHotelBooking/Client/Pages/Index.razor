@@ -1,14 +1,14 @@
 ﻿@page "/"
 
-<PageTitle>Blazing Hotels</PageTitle>
+<PageTitle>Pacific Tours</PageTitle>
 
 <AuthorizeView>
     <Authorized>
-        <h1>Welcome to Blazing Hotel @context.User.Identity!.Name!</h1>
+        <h1>Welcome to Pacific Tours @context.User.Identity!.Name!</h1>
         <p>Click on the Hotels link to see the list of hotels and book your desired hotel.</p>
     </Authorized>
     <NotAuthorized>
-        <h1>Welcome to Blazing Hotel!</h1>
+        <h1>Welcome to Pacific Tours!</h1>
         <p>You are not logged in. Please log in to access the website.</p>
     </NotAuthorized>
 </AuthorizeView>

@@ -395,7 +395,7 @@ namespace BlazorHotelBooking.Server.Controllers
 
             payment.UserId = dbTour.UserId;
             payment.bookingId = dbTour.Id;
-            payment.bookingType = "Package";
+            payment.bookingType = "Tour";
 
             if (dbTour.PaidInfull == true)
             {
