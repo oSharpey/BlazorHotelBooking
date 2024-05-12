@@ -22,14 +22,14 @@ jobs:
     - name: Log in to registry
       uses: docker/login-action@v2
       with:
-        username: ${{ secrets.AzureAppService_ContainerUsername_9c2ada26143e4b65a6487372490bf39c }}
-        password: ${{ secrets.AzureAppService_ContainerPassword_d4793095b32845d18984e4aa3afda983 }}
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_PASS }}
 
     - name: Build and push container image to registry
       uses: docker/build-push-action@v3
       with:
         push: true
-        tags: index.docker.io/${{ secrets.AzureAppService_ContainerUsername_9c2ada26143e4b65a6487372490bf39c }}/blazorhotelbooking-ccse:${{ github.sha }}
+        tags: index.docker.io/${{ secrets.DOCKERHUB_USER }}/blazorhotelbooking-ccse:${{ github.sha }}
         file: ./Dockerfile
 
   deploy:
@@ -47,4 +47,4 @@ jobs:
         app-name: 'CCSE-2240264-cw2'
         slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_be164aeaa42b4c9599e434ea57cc0cff }}
-        images: 'index.docker.io/${{ secrets.AzureAppService_ContainerUsername_9c2ada26143e4b65a6487372490bf39c }}/blazorhotelbooking-ccse:${{ github.sha }}'
+        images: 'index.docker.io/${{ secrets.DOCKERHUB_USER }}/blazorhotelbooking-ccse:${{ github.sha }}'
