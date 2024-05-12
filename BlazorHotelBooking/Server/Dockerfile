@@ -10,6 +10,7 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 ARG BUILD_CONFIGURATION=Release
+
 WORKDIR /src
 COPY ["BlazorHotelBooking/Server/BlazorHotelBooking.Server.csproj", "BlazorHotelBooking/Server/"]
 COPY ["BlazorHotelBooking/Client/BlazorHotelBooking.Client.csproj", "BlazorHotelBooking/Client/"]
@@ -25,5 +26,6 @@ RUN dotnet publish "./BlazorHotelBooking.Server.csproj" -c %BUILD_CONFIGURATION%
 
 FROM base AS final
 WORKDIR /app
+ENV ASPNETCORE_ENVIRONMENT=Production
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "BlazorHotelBooking.Server.dll"]
