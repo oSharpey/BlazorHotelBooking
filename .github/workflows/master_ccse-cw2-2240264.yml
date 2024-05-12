@@ -23,7 +23,7 @@ jobs:
           include-prerelease: true
 
       - name: restore
-        run: dotnet restore
+        run: dotnet restore BlazorHotelBooking.sln
 
       - name: Build with dotnet
         run: dotnet build BlazorHotelBooking.sln --configuration Release
