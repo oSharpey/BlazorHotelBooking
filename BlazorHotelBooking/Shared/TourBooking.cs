@@ -23,5 +23,3 @@ namespace BlazorHotelBooking.Shared
         public DateTime PaymentDueDate { get; set; }
     }
 }
-
-
