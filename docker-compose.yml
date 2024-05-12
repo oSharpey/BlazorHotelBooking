@@ -1,8 +1,7 @@
-version: '3.4'
-
 services:
-  blazorhotelbooking.server:
-    image: ${DOCKER_REGISTRY-}blazorhotelbookingserver
-    build:
-      context: .
-      dockerfile: BlazorHotelBooking/Server/Dockerfile
+  ccse:
+    build: . # build the Docker image 
+    container_name: ccse_app    
+    ports:
+      - "5000:80"
+ 
