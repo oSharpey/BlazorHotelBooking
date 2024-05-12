@@ -7,7 +7,9 @@ on:
   push:
     branches:
       - master
-   
+    paths:
+      - "BlazorHotelBooking/**"
+
   workflow_dispatch:
 
 jobs:
