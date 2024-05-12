@@ -33,20 +33,13 @@ jobs:
     permissions: write-all
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@master
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: 7.0.x
-      - name: check
-        run: ls BlazorHotelBooking/Server
-      - name: check2
-        run: pwd
       - name: Restore Nuget
-        run: | 
-          dotnet restore BlazorHotelBooking/Server
-          dotnet restore BlazorHotelBooking/Shared
-          dotnet restore BlazorHotelBooking/Client
-      - uses: actions/checkout@master
+        run: dotnet restore
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/dotnet@master
         continue-on-error: true
