@@ -100,4 +100,4 @@ jobs:
     - name: ZAP Scan
       uses: zaproxy/action-full-scan@v0.10.0
       with:
-        target: 'ccse-2240264-cw2.azurewebsites.net'
+        target: 'https://ccse-2240264-cw2.azurewebsites.net'
