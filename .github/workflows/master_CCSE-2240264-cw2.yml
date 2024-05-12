@@ -95,9 +95,14 @@ jobs:
 
   owasp-zap:
     runs-on: ubuntu-latest
+    permissions: write-all
     needs: deploy
     steps:
-    - name: ZAP Scan
-      uses: zaproxy/action-full-scan@v0.10.0
-      with:
-        target: 'https://ccse-2240264-cw2.azurewebsites.net'
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: master
+      - name: ZAP Scan
+        uses: zaproxy/action-full-scan@v0.10.0
+        with:
+          target: 'https://ccse-2240264-cw2.azurewebsites.net'
