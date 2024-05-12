@@ -1,10 +1,10 @@
-name: Build and deploy .NET Core application to Web App CCSE-2240264
+name: Build and deploy .NET Core application to Web App CCSE-CW2-2240264
 on:
   push:
     branches:
     - master
 env:
-  AZURE_WEBAPP_NAME: CCSE-2240264
+  AZURE_WEBAPP_NAME: CCSE-CW2-2240264
   AZURE_WEBAPP_PACKAGE_PATH: BlazorHotelBooking/Server/publish
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 7.0.x
@@ -44,5 +44,5 @@ jobs:
       uses: azure/webapps-deploy@v2
       with:
         app-name: ${{ env.AZURE_WEBAPP_NAME }}
-        publish-profile: ${{ secrets.CCSE_2240264_DBD6 }}
+        publish-profile: ${{ secrets.CCSE_CW2_2240264_3B0F }}
         package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
